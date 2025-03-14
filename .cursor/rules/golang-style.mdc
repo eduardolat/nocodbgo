@@ -1,0 +1,11 @@
+---
+description: This document describes how the golang code must be styled
+globs: *.go
+alwaysApply: false
+---
+
+# Go Style
+
+- All Golang code must be idiomatic, efficient, and extremely human-readable.
+- All functions must be documented with comments in an idiomatic manner and in English.
+- You should not include redundant comments inside functions because the code is expected to be self-explanatory.

@@ -1,0 +1,32 @@
+---
+description: These are the websites where you can find the NocoDB API documentation
+globs: 
+alwaysApply: true
+---
+
+# Structure
+
+The NocoDB API is divided into 2 parts:
+
+- Data API's: They are to manage the data of a specific table
+- Meta API's: They are used to manage higher-level things like users, databases, views, etc
+
+## Overview
+
+In this link you can find a brief description of the two APIs, as well as information about the query parameters that are useful for the Data API.
+
+https://docs.nocodb.com/developer-resources/rest-APIs/overview
+
+## Data API's
+
+In the links below you can find information on how to use the data API's.
+
+https://data-apis-v2.nocodb.com
+https://data-apis-v2.nocodb.com/swagger-v2.json
+
+## Meta API's
+
+In the links below you can find information on how to use the meta API's.
+
+https://meta-apis-v2.nocodb.com
+https://meta-apis-v2.nocodb.com/swagger-v2.json

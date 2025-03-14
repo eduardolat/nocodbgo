@@ -1,0 +1,22 @@
+# https://taskfile.dev
+
+version: "3"
+
+tasks:
+  test:
+    desc: Run all tests on this repo
+    cmd: go test ./...
+
+  lint:
+    desc: Lint all code on this repo
+    cmd: golangci-lint run ./...
+
+  fmt:
+    desc: Format all code on this repo
+    cmds:
+      - go fmt ./...
+      - deno fmt
+
+  fixperms:
+    desc: Fix permissions for all files and directories
+    cmd: chmod -R 777 .

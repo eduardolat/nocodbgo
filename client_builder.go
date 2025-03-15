@@ -40,8 +40,8 @@ func (b *clientBuilder) WithHTTPTimeout(timeout time.Duration) *clientBuilder {
 	return b
 }
 
-// Build creates a new NocoDB client with the configured options
-func (b *clientBuilder) Build() (*Client, error) {
+// Create creates the NocoDB client with the configured options
+func (b *clientBuilder) Create() (*Client, error) {
 	if b.baseURL == "" {
 		return nil, ErrBaseURLRequired
 	}

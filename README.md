@@ -51,7 +51,7 @@ client, err := nocodbgo.NewClient().
     WithBaseURL("https://example.com").
     WithAPIToken("your-api-token").
     WithHTTPTimeout(30*time.Second).
-    Build()
+    Create()
 if err != nil {
     // Handle error
 }

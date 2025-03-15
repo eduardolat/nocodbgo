@@ -180,4 +180,26 @@ func main() {
 		"Page Info: Total Rows: %d, Page: %d, Page Size: %d, Is First Page: %t, Is Last Page: %t\n",
 		complexResult.PageInfo.TotalRows, complexResult.PageInfo.Page, complexResult.PageInfo.PageSize, complexResult.PageInfo.IsFirstPage, complexResult.PageInfo.IsLastPage,
 	)
+
+	// Using the Where method for custom filter expressions
+	customFilterResult, err := table.List(context.Background()).
+		Where("(Number,gt,20)~or(Email,like,%@example.com)").
+		SortDesc("Number").
+		Limit(5).
+		Execute()
+	if err != nil {
+		log.Fatalf("Error listing users with custom filter: %v", err)
+	}
+
+	fmt.Printf("Users with custom filter: %v\n", customFilterResult.List)
+
+	// Using Where with Count
+	customFilterCount, err := table.Count(context.Background()).
+		Where("(SingleLineText,like,%Smith)~and(Number,gt,20)").
+		Execute()
+	if err != nil {
+		log.Fatalf("Error counting users with custom filter: %v", err)
+	}
+
+	fmt.Printf("User count with custom filter: %d\n", customFilterCount)
 }

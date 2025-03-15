@@ -190,6 +190,14 @@ func (b *listBuilder) NotAnyOf(column string, values ...string) *listBuilder {
 	return b
 }
 
+// Where adds a custom filter expression to the query
+func (b *listBuilder) Where(filter string) *listBuilder {
+	if filter != "" {
+		b.filters = append(b.filters, filter)
+	}
+	return b
+}
+
 // SortAsc adds an ascending sort to the query
 func (b *listBuilder) SortAsc(column string) *listBuilder {
 	b.sorts = append(b.sorts, column)
@@ -487,6 +495,14 @@ func (b *countBuilder) NotAnyOf(column string, values ...string) *countBuilder {
 
 	filter := fmt.Sprintf("(%s,%s,%s)", column, notAnyOf, strings.Join(values, ","))
 	b.filters = append(b.filters, filter)
+	return b
+}
+
+// Where adds a custom filter expression to the query
+func (b *countBuilder) Where(filter string) *countBuilder {
+	if filter != "" {
+		b.filters = append(b.filters, filter)
+	}
 	return b
 }
 

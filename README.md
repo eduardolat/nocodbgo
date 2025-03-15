@@ -30,6 +30,8 @@ using a fluent chain pattern.
 
 ## Installation
 
+Go version 1.22 or higher is required.
+
 ```bash
 go get github.com/eduardolat/nocodbgo
 ```

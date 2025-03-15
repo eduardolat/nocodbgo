@@ -15,12 +15,33 @@ type updateBuilder struct {
 }
 
 // UpdateRecord initiates the construction of an update query
-func (t *Table) UpdateRecord(recordID int, data map[string]any) *updateBuilder {
+//
+// The data parameter can be either a map[string]any or a struct with JSON tags
+func (t *Table) UpdateRecord(recordID int, data any) *updateBuilder {
+	var dataMap map[string]any
+	var err error
+
+	switch v := data.(type) {
+	case map[string]any:
+		dataMap = v
+	default:
+		dataMap, err = structToMap(data)
+		if err != nil {
+			// Return empty builder, error will be handled in Execute
+			return &updateBuilder{
+				table:    t,
+				ctx:      nil,
+				data:     nil,
+				recordID: recordID,
+			}
+		}
+	}
+
 	return &updateBuilder{
 		table:    t,
 		ctx:      nil,
 		recordID: recordID,
-		data:     data,
+		data:     dataMap,
 	}
 }
 
@@ -34,6 +55,10 @@ func (b *updateBuilder) WithContext(ctx context.Context) *updateBuilder {
 func (b *updateBuilder) Execute() error {
 	if b.recordID == 0 {
 		return ErrRowIDRequired
+	}
+
+	if b.data == nil {
+		return fmt.Errorf("failed to convert data to map")
 	}
 
 	// Add ID to the data
@@ -62,11 +87,33 @@ type bulkUpdateBuilder struct {
 }
 
 // BulkUpdateRecords initiates the construction of a bulk update query
-func (t *Table) BulkUpdateRecords(data []map[string]any) *bulkUpdateBuilder {
+//
+// The data parameter can be either a []map[string]any or a slice of structs with JSON tags
+//
+// Each record must have an "Id" field
+func (t *Table) BulkUpdateRecords(data any) *bulkUpdateBuilder {
+	var dataMaps []map[string]any
+	var err error
+
+	switch v := data.(type) {
+	case []map[string]any:
+		dataMaps = v
+	default:
+		dataMaps, err = structsToMaps(data)
+		if err != nil {
+			// Return empty builder, error will be handled in Execute
+			return &bulkUpdateBuilder{
+				table: t,
+				ctx:   nil,
+				data:  nil,
+			}
+		}
+	}
+
 	return &bulkUpdateBuilder{
 		table: t,
 		ctx:   nil,
-		data:  data,
+		data:  dataMaps,
 	}
 }
 
@@ -78,6 +125,10 @@ func (b *bulkUpdateBuilder) WithContext(ctx context.Context) *bulkUpdateBuilder 
 
 // Execute executes the bulk update query
 func (b *bulkUpdateBuilder) Execute() error {
+	if b.data == nil {
+		return fmt.Errorf("failed to convert data to maps")
+	}
+
 	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)
 	_, err := b.table.client.request(b.ctx, http.MethodPatch, path, b.data, nil)
 	if err != nil {

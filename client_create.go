@@ -15,11 +15,30 @@ type createBuilder struct {
 }
 
 // CreateRecord initiates the construction of a create query
-func (t *Table) CreateRecord(data map[string]any) *createBuilder {
+// The data parameter can be either a map[string]any or a struct with JSON tags
+func (t *Table) CreateRecord(data any) *createBuilder {
+	var dataMap map[string]any
+	var err error
+
+	switch v := data.(type) {
+	case map[string]any:
+		dataMap = v
+	default:
+		dataMap, err = structToMap(data)
+		if err != nil {
+			// Return empty builder, error will be handled in Execute
+			return &createBuilder{
+				table: t,
+				ctx:   nil,
+				data:  nil,
+			}
+		}
+	}
+
 	return &createBuilder{
 		table: t,
 		ctx:   nil,
-		data:  data,
+		data:  dataMap,
 	}
 }
 
@@ -31,6 +50,10 @@ func (b *createBuilder) WithContext(ctx context.Context) *createBuilder {
 
 // Execute executes the create query
 func (b *createBuilder) Execute() (int, error) {
+	if b.data == nil {
+		return 0, fmt.Errorf("failed to convert data to map")
+	}
+
 	records, err := b.table.
 		BulkCreateRecords([]map[string]any{b.data}).
 		WithContext(b.ctx).
@@ -54,11 +77,30 @@ type bulkCreateBuilder struct {
 }
 
 // BulkCreateRecords initiates the construction of a bulk create query
-func (t *Table) BulkCreateRecords(data []map[string]any) *bulkCreateBuilder {
+// The data parameter can be either a []map[string]any or a slice of structs with JSON tags
+func (t *Table) BulkCreateRecords(data any) *bulkCreateBuilder {
+	var dataMaps []map[string]any
+	var err error
+
+	switch v := data.(type) {
+	case []map[string]any:
+		dataMaps = v
+	default:
+		dataMaps, err = structsToMaps(data)
+		if err != nil {
+			// Return empty builder, error will be handled in Execute
+			return &bulkCreateBuilder{
+				table: t,
+				ctx:   nil,
+				data:  nil,
+			}
+		}
+	}
+
 	return &bulkCreateBuilder{
 		table: t,
 		ctx:   nil,
-		data:  data,
+		data:  dataMaps,
 	}
 }
 
@@ -70,6 +112,10 @@ func (b *bulkCreateBuilder) WithContext(ctx context.Context) *bulkCreateBuilder 
 
 // Execute executes the bulk create query
 func (b *bulkCreateBuilder) Execute() ([]int, error) {
+	if b.data == nil {
+		return nil, fmt.Errorf("failed to convert data to maps")
+	}
+
 	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)
 	respBody, err := b.table.client.request(b.ctx, http.MethodPost, path, b.data, nil)
 	if err != nil {

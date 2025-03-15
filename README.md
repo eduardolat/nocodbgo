@@ -63,7 +63,7 @@ if err != nil {
 // Get a table
 table := client.Table("your-table-id")
 
-// Create a record
+// Create a record, this can be a map[string]any or a struct with JSON tags
 user := map[string]any{
     "Name": "John Doe",
     "Email": "john@example.com",

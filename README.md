@@ -18,7 +18,7 @@
   </a>
 </p>
 
-A Go client for the
+A Zero-Dependency Go client for the
 [NocoDB API](https://docs.nocodb.com/developer-resources/rest-APIs/overview).
 This client provides a simple and intuitive way to interact with the NocoDB API
 using a fluent chain pattern.

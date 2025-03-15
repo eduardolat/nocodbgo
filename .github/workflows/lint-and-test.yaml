@@ -23,6 +23,9 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           push: never
-          runCmd: |
-            task lint
-            task test
+          runCmd: >
+            /bin/bash -c "
+              go mod download &&
+              task lint &&
+              task test
+            "

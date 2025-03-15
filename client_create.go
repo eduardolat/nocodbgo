@@ -9,9 +9,10 @@ import (
 
 // createBuilder is used to build a create query with a fluent API
 type createBuilder struct {
-	table *Table
-	ctx   context.Context
-	data  map[string]any
+	table    *Table
+	ctx      context.Context
+	data     map[string]any
+	chainErr error // Stores any error in the chain of methods
 }
 
 // CreateRecord initiates the construction of a create query
@@ -25,20 +26,13 @@ func (t *Table) CreateRecord(data any) *createBuilder {
 		dataMap = v
 	default:
 		dataMap, err = structToMap(data)
-		if err != nil {
-			// Return empty builder, error will be handled in Execute
-			return &createBuilder{
-				table: t,
-				ctx:   nil,
-				data:  nil,
-			}
-		}
 	}
 
 	return &createBuilder{
-		table: t,
-		ctx:   nil,
-		data:  dataMap,
+		table:    t,
+		ctx:      nil,
+		data:     dataMap,
+		chainErr: err,
 	}
 }
 
@@ -50,8 +44,8 @@ func (b *createBuilder) WithContext(ctx context.Context) *createBuilder {
 
 // Execute executes the create query
 func (b *createBuilder) Execute() (int, error) {
-	if b.data == nil {
-		return 0, fmt.Errorf("failed to convert data to map")
+	if b.chainErr != nil {
+		return 0, fmt.Errorf("error in the chain of methods: %w", b.chainErr)
 	}
 
 	records, err := b.table.
@@ -71,9 +65,10 @@ func (b *createBuilder) Execute() (int, error) {
 
 // bulkCreateBuilder is used to build a bulk create query with a fluent API
 type bulkCreateBuilder struct {
-	table *Table
-	ctx   context.Context
-	data  []map[string]any
+	table    *Table
+	ctx      context.Context
+	data     []map[string]any
+	chainErr error // Stores any error in the chain of methods
 }
 
 // BulkCreateRecords initiates the construction of a bulk create query
@@ -87,20 +82,13 @@ func (t *Table) BulkCreateRecords(data any) *bulkCreateBuilder {
 		dataMaps = v
 	default:
 		dataMaps, err = structsToMaps(data)
-		if err != nil {
-			// Return empty builder, error will be handled in Execute
-			return &bulkCreateBuilder{
-				table: t,
-				ctx:   nil,
-				data:  nil,
-			}
-		}
 	}
 
 	return &bulkCreateBuilder{
-		table: t,
-		ctx:   nil,
-		data:  dataMaps,
+		table:    t,
+		ctx:      nil,
+		data:     dataMaps,
+		chainErr: err,
 	}
 }
 
@@ -112,8 +100,8 @@ func (b *bulkCreateBuilder) WithContext(ctx context.Context) *bulkCreateBuilder 
 
 // Execute executes the bulk create query
 func (b *bulkCreateBuilder) Execute() ([]int, error) {
-	if b.data == nil {
-		return nil, fmt.Errorf("failed to convert data to maps")
+	if b.chainErr != nil {
+		return nil, fmt.Errorf("error in the chain of methods: %w", b.chainErr)
 	}
 
 	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)

@@ -163,11 +163,6 @@ func (c *Client) buildTablePath(tableID string, recordID string) string {
 	return fmt.Sprintf("/api/v2/tables/%s/records", tableID)
 }
 
-// buildLinkPath builds the path for link API endpoints
-func (c *Client) buildLinkPath(tableID, linkFieldID, recordID string) string {
-	return fmt.Sprintf("/api/v2/tables/%s/links/%s/records/%s", tableID, linkFieldID, recordID)
-}
-
 /********************
  * Table Operations *
  *******************/
@@ -349,70 +344,6 @@ func (t *Table) BulkDelete(ctx context.Context, ids []map[string]any) error {
 	_, err := t.client.request(ctx, http.MethodDelete, path, ids, nil)
 	if err != nil {
 		return fmt.Errorf("failed to delete records: %w", err)
-	}
-
-	return nil
-}
-
-// GetLinks retrieves linked records for a specific link field and record ID
-func (t *Table) GetLinks(ctx context.Context, linkFieldID, recordID string, options ...QueryOption) (ListResponse, error) {
-	if linkFieldID == "" {
-		return ListResponse{}, fmt.Errorf("link field ID is required")
-	}
-	if recordID == "" {
-		return ListResponse{}, ErrRowIDRequired
-	}
-
-	query := url.Values{}
-	for _, option := range options {
-		option(query)
-	}
-
-	path := t.client.buildLinkPath(t.tableID, linkFieldID, recordID)
-	respBody, err := t.client.request(ctx, http.MethodGet, path, nil, query)
-	if err != nil {
-		return ListResponse{}, fmt.Errorf("failed to get links: %w", err)
-	}
-
-	var response ListResponse
-	if err := json.Unmarshal(respBody, &response); err != nil {
-		return ListResponse{}, fmt.Errorf("failed to unmarshal get links response: %w", err)
-	}
-
-	return response, nil
-}
-
-// CreateLinks creates links between records
-func (t *Table) CreateLinks(ctx context.Context, linkFieldID, recordID string, linkedRecordIDs []map[string]any) error {
-	if linkFieldID == "" {
-		return fmt.Errorf("link field ID is required")
-	}
-	if recordID == "" {
-		return ErrRowIDRequired
-	}
-
-	path := t.client.buildLinkPath(t.tableID, linkFieldID, recordID)
-	_, err := t.client.request(ctx, http.MethodPost, path, linkedRecordIDs, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create links: %w", err)
-	}
-
-	return nil
-}
-
-// DeleteLinks deletes links between records
-func (t *Table) DeleteLinks(ctx context.Context, linkFieldID, recordID string, linkedRecordIDs []map[string]any) error {
-	if linkFieldID == "" {
-		return fmt.Errorf("link field ID is required")
-	}
-	if recordID == "" {
-		return ErrRowIDRequired
-	}
-
-	path := t.client.buildLinkPath(t.tableID, linkFieldID, recordID)
-	_, err := t.client.request(ctx, http.MethodDelete, path, linkedRecordIDs, nil)
-	if err != nil {
-		return fmt.Errorf("failed to delete links: %w", err)
 	}
 
 	return nil

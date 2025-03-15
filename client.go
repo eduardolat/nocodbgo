@@ -45,16 +45,37 @@ func NewClient() *clientBuilder {
 
 // apiError represents an error returned by the NocoDB API
 type apiError struct {
-	Message string `json:"msg"`
+	Msg     string `json:"msg"`
+	Message string `json:"message"`
+	ErrMsg  string `json:"error"`
 	Code    string `json:"code"`
 }
 
 // Error implements the error interface
 func (e apiError) Error() string {
 	if e.Code != "" {
-		return fmt.Sprintf("API error: %s (code: %s)", e.Message, e.Code)
+		if e.Msg != "" {
+			return fmt.Sprintf("%s: %s)", e.Code, e.Msg)
+		}
+		if e.Message != "" {
+			return fmt.Sprintf("%s: %s)", e.Code, e.Message)
+		}
+		if e.ErrMsg != "" {
+			return fmt.Sprintf("%s: %s)", e.Code, e.ErrMsg)
+		}
 	}
-	return fmt.Sprintf("API error: %s", e.Message)
+
+	if e.Msg != "" {
+		return e.Msg
+	}
+	if e.Message != "" {
+		return e.Message
+	}
+	if e.ErrMsg != "" {
+		return e.ErrMsg
+	}
+
+	return "Unknown error"
 }
 
 // request makes an HTTP request to the NocoDB API, it includes the api token in the request header
@@ -103,7 +124,7 @@ func (c *Client) request(ctx context.Context, method string, path string, body a
 		if err := json.Unmarshal(respBody, &apiErr); err != nil {
 			return nil, fmt.Errorf("status code %d: failed to unmarshal API error: %w", resp.StatusCode, err)
 		}
-		return nil, fmt.Errorf("status code %d: API error: %s", resp.StatusCode, apiErr.Message)
+		return nil, fmt.Errorf("status code %d: API error: %s", resp.StatusCode, apiErr.Error())
 	}
 
 	return respBody, nil

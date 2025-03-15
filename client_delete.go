@@ -13,8 +13,8 @@ type deleteBuilder struct {
 	recordID int
 }
 
-// Delete initiates the construction of a delete query
-func (t *Table) Delete(recordID int) *deleteBuilder {
+// DeleteRecord initiates the construction of a delete query
+func (t *Table) DeleteRecord(recordID int) *deleteBuilder {
 	return &deleteBuilder{
 		table:    t,
 		ctx:      nil,
@@ -35,7 +35,7 @@ func (b *deleteBuilder) Execute() error {
 	}
 
 	err := b.table.
-		BulkDelete([]int{b.recordID}).
+		BulkDeleteRecords([]int{b.recordID}).
 		WithContext(b.ctx).
 		Execute()
 	if err != nil {
@@ -52,8 +52,8 @@ type bulkDeleteBuilder struct {
 	recordIDs []int
 }
 
-// BulkDelete initiates the construction of a bulk delete query
-func (t *Table) BulkDelete(recordIDs []int) *bulkDeleteBuilder {
+// BulkDeleteRecords initiates the construction of a bulk delete query
+func (t *Table) BulkDeleteRecords(recordIDs []int) *bulkDeleteBuilder {
 	return &bulkDeleteBuilder{
 		table:     t,
 		ctx:       nil,

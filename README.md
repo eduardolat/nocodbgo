@@ -70,7 +70,7 @@ user := map[string]any{
     "Age": 30,
 }
 
-userID, err := table.Create(user).
+userID, err := table.CreateRecord(user).
     WithContext(context.Background()).
     Execute()
 if err != nil {
@@ -78,7 +78,7 @@ if err != nil {
 }
 
 // Read a record
-readResponse, err := table.Read(userID).
+readResponse, err := table.ReadRecord(userID).
     WithContext(context.Background()).
     Fields("Name", "Email", "Age").
     Execute()
@@ -105,7 +105,7 @@ updateUser := map[string]any{
     "Name": "John Smith",
 }
 
-err = table.Update(userID, updateUser).
+err = table.UpdateRecord(userID, updateUser).
     WithContext(context.Background()).
     Execute()
 if err != nil {
@@ -113,7 +113,7 @@ if err != nil {
 }
 
 // Delete a record
-err = table.Delete(userID).
+err = table.DeleteRecord(userID).
     WithContext(context.Background()).
     Execute()
 if err != nil {
@@ -125,7 +125,7 @@ if err != nil {
 
 ```go
 // List records with options using the chain pattern
-result, err := table.List().
+result, err := table.ListRecords().
     WithContext(context.Background()).
     GreaterThan("Age", "18").
     SortAsc("Name").
@@ -156,7 +156,7 @@ if err != nil {
 
 ```go
 // Query with complex filters
-result, err := table.List().
+result, err := table.ListRecords().
     WithContext(context.Background()).
     EqualTo("Name", "John Smith").
     GreaterThan("Age", "18").
@@ -186,7 +186,7 @@ bulkUsers := []map[string]any{
     },
 }
 
-createdUsers, err := table.BulkCreate(bulkUsers).
+createdUsers, err := table.BulkCreateRecords(bulkUsers).
     WithContext(context.Background()).
     Execute()
 if err != nil {
@@ -205,7 +205,7 @@ bulkUpdateUsers := []map[string]any{
     },
 }
 
-err = table.BulkUpdate(bulkUpdateUsers).
+err = table.BulkUpdateRecords(bulkUpdateUsers).
     WithContext(context.Background()).
     Execute()
 if err != nil {
@@ -213,7 +213,7 @@ if err != nil {
 }
 
 // Bulk delete records
-err = table.BulkDelete(createdUsers).
+err = table.BulkDeleteRecords(createdUsers).
     WithContext(context.Background()).
     Execute()
 if err != nil {

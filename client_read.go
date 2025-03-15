@@ -17,8 +17,8 @@ type readBuilder struct {
 	fields   []string
 }
 
-// Read initiates the construction of a read query
-func (t *Table) Read(recordID int) *readBuilder {
+// ReadRecord initiates the construction of a read query
+func (t *Table) ReadRecord(recordID int) *readBuilder {
 	return &readBuilder{
 		table:    t,
 		ctx:      nil,

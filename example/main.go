@@ -38,7 +38,7 @@ func main() {
 		"Number":         30,
 	}
 
-	userID, err := table.Create(user).
+	userID, err := table.CreateRecord(user).
 		WithContext(context.Background()).
 		Execute()
 	if err != nil {
@@ -46,7 +46,7 @@ func main() {
 	}
 
 	// Read the user using the chain pattern
-	readResponse, err := table.Read(userID).
+	readResponse, err := table.ReadRecord(userID).
 		WithContext(context.Background()).
 		Fields("SingleLineText", "Email", "Number").
 		Execute()
@@ -70,7 +70,7 @@ func main() {
 		"SingleLineText": "John Smith",
 	}
 
-	err = table.Update(userID, updateUser).
+	err = table.UpdateRecord(userID, updateUser).
 		WithContext(context.Background()).
 		Execute()
 	if err != nil {
@@ -78,7 +78,7 @@ func main() {
 	}
 
 	// List users with filters using the chain pattern
-	listResponse, err := table.List().
+	listResponse, err := table.ListRecords().
 		WithContext(context.Background()).
 		GreaterThan("Number", "18").
 		SortAsc("SingleLineText").
@@ -115,7 +115,7 @@ func main() {
 	fmt.Printf("User count: %d\n", count)
 
 	// Delete the user
-	err = table.Delete(userID).
+	err = table.DeleteRecord(userID).
 		WithContext(context.Background()).
 		Execute()
 	if err != nil {
@@ -138,7 +138,7 @@ func main() {
 		},
 	}
 
-	createdUsers, err := table.BulkCreate(bulkUsers).
+	createdUsers, err := table.BulkCreateRecords(bulkUsers).
 		WithContext(context.Background()).
 		Execute()
 	if err != nil {
@@ -159,7 +159,7 @@ func main() {
 		},
 	}
 
-	err = table.BulkUpdate(bulkUpdateUsers).
+	err = table.BulkUpdateRecords(bulkUpdateUsers).
 		WithContext(context.Background()).
 		Execute()
 	if err != nil {
@@ -169,7 +169,7 @@ func main() {
 	fmt.Println("Users updated")
 
 	// Bulk delete users
-	err = table.BulkDelete(createdUsers).
+	err = table.BulkDeleteRecords(createdUsers).
 		WithContext(context.Background()).
 		Execute()
 	if err != nil {
@@ -179,7 +179,7 @@ func main() {
 	fmt.Println("Users deleted")
 
 	// Complex filtering using the chain pattern
-	complexResult, err := table.List().
+	complexResult, err := table.ListRecords().
 		WithContext(context.Background()).
 		EqualTo("SingleLineText", "John Smith").
 		GreaterThan("Number", "18").
@@ -198,7 +198,7 @@ func main() {
 	)
 
 	// Using the Where method for custom filter expressions
-	customFilterResult, err := table.List().
+	customFilterResult, err := table.ListRecords().
 		WithContext(context.Background()).
 		Where("(Number,gt,20)~or(Email,like,%@example.com)").
 		SortDesc("Number").

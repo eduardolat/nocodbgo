@@ -22,8 +22,8 @@ type listBuilder struct {
 	shuffle bool
 }
 
-// List initiates the construction of a list query
-func (t *Table) List() *listBuilder {
+// ListRecords initiates the construction of a list query
+func (t *Table) ListRecords() *listBuilder {
 	return &listBuilder{
 		table: t,
 		ctx:   nil,

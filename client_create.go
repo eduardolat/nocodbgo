@@ -14,8 +14,8 @@ type createBuilder struct {
 	data  map[string]any
 }
 
-// Create initiates the construction of a create query
-func (t *Table) Create(data map[string]any) *createBuilder {
+// CreateRecord initiates the construction of a create query
+func (t *Table) CreateRecord(data map[string]any) *createBuilder {
 	return &createBuilder{
 		table: t,
 		ctx:   nil,
@@ -32,7 +32,7 @@ func (b *createBuilder) WithContext(ctx context.Context) *createBuilder {
 // Execute executes the create query
 func (b *createBuilder) Execute() (int, error) {
 	records, err := b.table.
-		BulkCreate([]map[string]any{b.data}).
+		BulkCreateRecords([]map[string]any{b.data}).
 		WithContext(b.ctx).
 		Execute()
 	if err != nil {
@@ -53,8 +53,8 @@ type bulkCreateBuilder struct {
 	data  []map[string]any
 }
 
-// BulkCreate initiates the construction of a bulk create query
-func (t *Table) BulkCreate(data []map[string]any) *bulkCreateBuilder {
+// BulkCreateRecords initiates the construction of a bulk create query
+func (t *Table) BulkCreateRecords(data []map[string]any) *bulkCreateBuilder {
 	return &bulkCreateBuilder{
 		table: t,
 		ctx:   nil,

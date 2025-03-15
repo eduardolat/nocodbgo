@@ -14,8 +14,8 @@ type updateBuilder struct {
 	data     map[string]any
 }
 
-// Update initiates the construction of an update query
-func (t *Table) Update(recordID int, data map[string]any) *updateBuilder {
+// UpdateRecord initiates the construction of an update query
+func (t *Table) UpdateRecord(recordID int, data map[string]any) *updateBuilder {
 	return &updateBuilder{
 		table:    t,
 		ctx:      nil,
@@ -44,7 +44,7 @@ func (b *updateBuilder) Execute() error {
 	updateData["Id"] = b.recordID
 
 	err := b.table.
-		BulkUpdate([]map[string]any{updateData}).
+		BulkUpdateRecords([]map[string]any{updateData}).
 		WithContext(b.ctx).
 		Execute()
 	if err != nil {
@@ -61,8 +61,8 @@ type bulkUpdateBuilder struct {
 	data  []map[string]any
 }
 
-// BulkUpdate initiates the construction of a bulk update query
-func (t *Table) BulkUpdate(data []map[string]any) *bulkUpdateBuilder {
+// BulkUpdateRecords initiates the construction of a bulk update query
+func (t *Table) BulkUpdateRecords(data []map[string]any) *bulkUpdateBuilder {
 	return &bulkUpdateBuilder{
 		table: t,
 		ctx:   nil,

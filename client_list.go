@@ -36,78 +36,78 @@ func (b *listBuilder) WithContext(ctx context.Context) *listBuilder {
 	return b
 }
 
-// EqualTo adds an equality filter to the query
-func (b *listBuilder) EqualTo(column string, value string) *listBuilder {
+// FilterEqualTo adds an equality filter to the query
+func (b *listBuilder) FilterEqualTo(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, equal, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// NotEqualTo adds an inequality filter to the query
-func (b *listBuilder) NotEqualTo(column string, value string) *listBuilder {
+// FilterNotEqualTo adds an inequality filter to the query
+func (b *listBuilder) FilterNotEqualTo(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, notEqual, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// GreaterThan adds a greater than filter to the query
-func (b *listBuilder) GreaterThan(column string, value string) *listBuilder {
+// FilterGreaterThan adds a greater than filter to the query
+func (b *listBuilder) FilterGreaterThan(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, greaterThan, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// GreaterThanOrEqual adds a greater than or equal filter to the query
-func (b *listBuilder) GreaterThanOrEqual(column string, value string) *listBuilder {
+// FilterGreaterThanOrEqual adds a greater than or equal filter to the query
+func (b *listBuilder) FilterGreaterThanOrEqual(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, greaterThanOrEqual, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// LessThan adds a less than filter to the query
-func (b *listBuilder) LessThan(column string, value string) *listBuilder {
+// FilterLessThan adds a less than filter to the query
+func (b *listBuilder) FilterLessThan(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, lessThan, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// LessThanOrEqual adds a less than or equal filter to the query
-func (b *listBuilder) LessThanOrEqual(column string, value string) *listBuilder {
+// FilterLessThanOrEqual adds a less than or equal filter to the query
+func (b *listBuilder) FilterLessThanOrEqual(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, lessThanOrEqual, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// IsNull adds a is null filter to the query
-func (b *listBuilder) IsNull(column string) *listBuilder {
+// FilterIsNull adds a is null filter to the query
+func (b *listBuilder) FilterIsNull(column string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, is, "null")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// IsNotNull adds a is not null filter to the query
-func (b *listBuilder) IsNotNull(column string) *listBuilder {
+// FilterIsNotNull adds a is not null filter to the query
+func (b *listBuilder) FilterIsNotNull(column string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, isNot, "null")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// IsTrue adds a is true filter to the query
-func (b *listBuilder) IsTrue(column string) *listBuilder {
+// FilterIsTrue adds a is true filter to the query
+func (b *listBuilder) FilterIsTrue(column string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, is, "true")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// IsFalse adds a is false filter to the query
-func (b *listBuilder) IsFalse(column string) *listBuilder {
+// FilterIsFalse adds a is false filter to the query
+func (b *listBuilder) FilterIsFalse(column string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, is, "false")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// In adds an in filter to the query
-func (b *listBuilder) In(column string, values ...string) *listBuilder {
+// FilterIn adds an in filter to the query
+func (b *listBuilder) FilterIn(column string, values ...string) *listBuilder {
 	if len(values) == 0 {
 		return b
 	}
@@ -117,43 +117,43 @@ func (b *listBuilder) In(column string, values ...string) *listBuilder {
 	return b
 }
 
-// Between adds a between filter to the query
-func (b *listBuilder) Between(column string, min, max string) *listBuilder {
+// FilterBetween adds a between filter to the query
+func (b *listBuilder) FilterBetween(column string, min, max string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s,%s)", column, between, min, max)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// NotBetween adds a not between filter to the query
-func (b *listBuilder) NotBetween(column string, min, max string) *listBuilder {
+// FilterNotBetween adds a not between filter to the query
+func (b *listBuilder) FilterNotBetween(column string, min, max string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s,%s)", column, notBetween, min, max)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// Like adds a like filter to the query
-func (b *listBuilder) Like(column string, value string) *listBuilder {
+// FilterLike adds a like filter to the query
+func (b *listBuilder) FilterLike(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, like, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// NotLike adds a not like filter to the query
-func (b *listBuilder) NotLike(column string, value string) *listBuilder {
+// FilterNotLike adds a not like filter to the query
+func (b *listBuilder) FilterNotLike(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, notLike, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// IsWithin adds an isWithin filter to the query (Available in Date and DateTime only)
-func (b *listBuilder) IsWithin(column string, subOperation string) *listBuilder {
+// FilterIsWithin adds an isWithin filter to the query (Available in Date and DateTime only)
+func (b *listBuilder) FilterIsWithin(column string, subOperation string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, isWithin, subOperation)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// AllOf adds an allOf filter to the query (includes all of the values)
-func (b *listBuilder) AllOf(column string, values ...string) *listBuilder {
+// FilterAllOf adds an allOf filter to the query (includes all of the values)
+func (b *listBuilder) FilterAllOf(column string, values ...string) *listBuilder {
 	if len(values) == 0 {
 		return b
 	}
@@ -163,8 +163,8 @@ func (b *listBuilder) AllOf(column string, values ...string) *listBuilder {
 	return b
 }
 
-// AnyOf adds an anyOf filter to the query (includes any of the values)
-func (b *listBuilder) AnyOf(column string, values ...string) *listBuilder {
+// FilterAnyOf adds an anyOf filter to the query (includes any of the values)
+func (b *listBuilder) FilterAnyOf(column string, values ...string) *listBuilder {
 	if len(values) == 0 {
 		return b
 	}
@@ -174,8 +174,8 @@ func (b *listBuilder) AnyOf(column string, values ...string) *listBuilder {
 	return b
 }
 
-// NotAllOf adds a notAllOf filter to the query (does not include all of the values)
-func (b *listBuilder) NotAllOf(column string, values ...string) *listBuilder {
+// FilterNotAllOf adds a notAllOf filter to the query (does not include all of the values)
+func (b *listBuilder) FilterNotAllOf(column string, values ...string) *listBuilder {
 	if len(values) == 0 {
 		return b
 	}
@@ -185,8 +185,8 @@ func (b *listBuilder) NotAllOf(column string, values ...string) *listBuilder {
 	return b
 }
 
-// NotAnyOf adds a notAnyOf filter to the query (does not include any of the values)
-func (b *listBuilder) NotAnyOf(column string, values ...string) *listBuilder {
+// FilterNotAnyOf adds a notAnyOf filter to the query (does not include any of the values)
+func (b *listBuilder) FilterNotAnyOf(column string, values ...string) *listBuilder {
 	if len(values) == 0 {
 		return b
 	}
@@ -196,22 +196,22 @@ func (b *listBuilder) NotAnyOf(column string, values ...string) *listBuilder {
 	return b
 }
 
-// Where adds a custom filter expression to the query
-func (b *listBuilder) Where(filter string) *listBuilder {
+// FilterWhere adds a custom filter expression to the query
+func (b *listBuilder) FilterWhere(filter string) *listBuilder {
 	if filter != "" {
 		b.filters = append(b.filters, filter)
 	}
 	return b
 }
 
-// SortAsc adds an ascending sort to the query
-func (b *listBuilder) SortAsc(column string) *listBuilder {
+// SortAscBy adds an ascending sort to the query
+func (b *listBuilder) SortAscBy(column string) *listBuilder {
 	b.sorts = append(b.sorts, column)
 	return b
 }
 
-// SortDesc adds a descending sort to the query
-func (b *listBuilder) SortDesc(column string) *listBuilder {
+// SortDescBy adds a descending sort to the query
+func (b *listBuilder) SortDescBy(column string) *listBuilder {
 	b.sorts = append(b.sorts, "-"+column)
 	return b
 }
@@ -241,8 +241,8 @@ func (b *listBuilder) Page(page, pageSize int) *listBuilder {
 	return b
 }
 
-// Fields adds specific fields to the query
-func (b *listBuilder) Fields(fields ...string) *listBuilder {
+// ReturnFields adds specific fields to the query
+func (b *listBuilder) ReturnFields(fields ...string) *listBuilder {
 	b.fields = fields
 	return b
 }

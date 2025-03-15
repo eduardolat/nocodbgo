@@ -32,8 +32,8 @@ func (b *readBuilder) WithContext(ctx context.Context) *readBuilder {
 	return b
 }
 
-// Fields adds specific fields to the query
-func (b *readBuilder) Fields(fields ...string) *readBuilder {
+// ReturnFields adds specific fields to the query
+func (b *readBuilder) ReturnFields(fields ...string) *readBuilder {
 	b.fields = fields
 	return b
 }

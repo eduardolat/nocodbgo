@@ -48,7 +48,7 @@ func main() {
 	// Read the user using the chain pattern
 	readResponse, err := table.ReadRecord(userID).
 		WithContext(context.Background()).
-		Fields("SingleLineText", "Email", "Number").
+		ReturnFields("SingleLineText", "Email", "Number").
 		Execute()
 	if err != nil {
 		log.Fatalf("Error reading user: %v", err)
@@ -80,8 +80,8 @@ func main() {
 	// List users with filters using the chain pattern
 	listResponse, err := table.ListRecords().
 		WithContext(context.Background()).
-		GreaterThan("Number", "18").
-		SortAsc("SingleLineText").
+		FilterGreaterThan("Number", "18").
+		SortAscBy("SingleLineText").
 		Limit(10).
 		Execute()
 	if err != nil {
@@ -106,7 +106,7 @@ func main() {
 	// Count users using the chain pattern
 	count, err := table.Count().
 		WithContext(context.Background()).
-		GreaterThan("Number", "18").
+		FilterGreaterThan("Number", "18").
 		Execute()
 	if err != nil {
 		log.Fatalf("Error counting users: %v", err)
@@ -181,10 +181,10 @@ func main() {
 	// Complex filtering using the chain pattern
 	complexResult, err := table.ListRecords().
 		WithContext(context.Background()).
-		EqualTo("SingleLineText", "John Smith").
-		GreaterThan("Number", "18").
-		LessThan("Number", "30").
-		SortAsc("SingleLineText").
+		FilterEqualTo("SingleLineText", "John Smith").
+		FilterGreaterThan("Number", "18").
+		FilterLessThan("Number", "30").
+		SortAscBy("SingleLineText").
 		Limit(10).
 		Execute()
 	if err != nil {
@@ -197,11 +197,11 @@ func main() {
 		complexResult.PageInfo.TotalRows, complexResult.PageInfo.Page, complexResult.PageInfo.PageSize, complexResult.PageInfo.IsFirstPage, complexResult.PageInfo.IsLastPage,
 	)
 
-	// Using the Where method for custom filter expressions
+	// Using the FilterWhere method for custom filter expressions
 	customFilterResult, err := table.ListRecords().
 		WithContext(context.Background()).
-		Where("(Number,gt,20)~or(Email,like,%@example.com)").
-		SortDesc("Number").
+		FilterWhere("(Number,gt,20)~or(Email,like,%@example.com)").
+		SortDescBy("Number").
 		Limit(5).
 		Execute()
 	if err != nil {
@@ -210,10 +210,10 @@ func main() {
 
 	fmt.Printf("Users with custom filter: %v\n", customFilterResult.List)
 
-	// Using Where with Count
+	// Using FilterWhere with Count
 	customFilterCount, err := table.Count().
 		WithContext(context.Background()).
-		Where("(SingleLineText,like,%Smith)~and(Number,gt,20)").
+		FilterWhere("(SingleLineText,like,%Smith)~and(Number,gt,20)").
 		Execute()
 	if err != nil {
 		log.Fatalf("Error counting users with custom filter: %v", err)

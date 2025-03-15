@@ -80,7 +80,7 @@ if err != nil {
 // Read a record
 readResponse, err := table.ReadRecord(userID).
     WithContext(context.Background()).
-    Fields("Name", "Email", "Age").
+    ReturnFields("Name", "Email", "Age").
     Execute()
 if err != nil {
     // Handle error
@@ -127,8 +127,8 @@ if err != nil {
 // List records with options using the chain pattern
 result, err := table.ListRecords().
     WithContext(context.Background()).
-    GreaterThan("Age", "18").
-    SortAsc("Name").
+    FilterGreaterThan("Age", "18").
+    SortAscBy("Name").
     Limit(10).
     Execute()
 if err != nil {
@@ -145,7 +145,7 @@ if err != nil {
 // Count records
 count, err := table.Count().
     WithContext(context.Background()).
-    GreaterThan("Age", "18").
+    FilterGreaterThan("Age", "18").
     Execute()
 if err != nil {
     // Handle error
@@ -158,10 +158,10 @@ if err != nil {
 // Query with complex filters
 result, err := table.ListRecords().
     WithContext(context.Background()).
-    EqualTo("Name", "John Smith").
-    GreaterThan("Age", "18").
-    LessThan("Age", "30").
-    SortAsc("Name").
+    FilterEqualTo("Name", "John Smith").
+    FilterGreaterThan("Age", "18").
+    FilterLessThan("Age", "30").
+    SortAscBy("Name").
     Limit(10).
     Execute()
 if err != nil {

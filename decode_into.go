@@ -5,8 +5,8 @@ import (
 	"fmt"
 )
 
-// decode is a helper function to decode data into a destination struct
-func decode(data any, dest any) error {
+// decodeInto is a helper function to decode data into a destination struct
+func decodeInto(data any, dest any) error {
 	// Convert the data to JSON
 	jsonData, err := json.Marshal(data)
 	if err != nil {

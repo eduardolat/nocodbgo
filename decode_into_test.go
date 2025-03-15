@@ -21,7 +21,7 @@ func TestDecode(t *testing.T) {
 	}
 
 	var user User
-	err := decode(data, &user)
+	err := decodeInto(data, &user)
 	if err != nil {
 		t.Errorf("Decode() error = %v", err)
 	}
@@ -40,7 +40,7 @@ func TestDecode(t *testing.T) {
 	}
 
 	// Test error case: invalid destination
-	err = decode(data, data)
+	err = decodeInto(data, data)
 	if err == nil {
 		t.Errorf("Decode() error = nil, want error")
 	}
@@ -75,7 +75,7 @@ func TestListResponseDecode(t *testing.T) {
 	}
 
 	var users []User
-	err := response.Decode(&users)
+	err := response.DecodeInto(&users)
 	if err != nil {
 		t.Errorf("Decode() error = %v", err)
 	}
@@ -132,7 +132,7 @@ func TestReadResponseDecode(t *testing.T) {
 	}
 
 	var user User
-	err := response.Decode(&user)
+	err := response.DecodeInto(&user)
 	if err != nil {
 		t.Errorf("Decode() error = %v", err)
 	}

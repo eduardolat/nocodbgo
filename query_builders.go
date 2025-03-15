@@ -23,11 +23,17 @@ type listBuilder struct {
 }
 
 // List initiates the construction of a list query
-func (t *Table) List(ctx context.Context) *listBuilder {
+func (t *Table) List() *listBuilder {
 	return &listBuilder{
 		table: t,
-		ctx:   ctx,
+		ctx:   nil,
 	}
+}
+
+// WithContext sets the context for the query
+func (b *listBuilder) WithContext(ctx context.Context) *listBuilder {
+	b.ctx = ctx
+	return b
 }
 
 // EqualTo adds an equality filter to the query
@@ -269,10 +275,10 @@ type PageInfo struct {
 	IsLastPage bool `json:"isLastPage"`
 }
 
-// Decode converts the list response into a slice of structs
+// DecodeInto converts the list response into a slice of structs
 // It takes a pointer to a slice of structs as destination and populates it with the data
-func (r ListResponse) Decode(dest any) error {
-	return decode(r.List, dest)
+func (r ListResponse) DecodeInto(dest any) error {
+	return decodeInto(r.List, dest)
 }
 
 // Execute executes the list query
@@ -331,11 +337,17 @@ type countBuilder struct {
 }
 
 // Count initiates the construction of a count query
-func (t *Table) Count(ctx context.Context) *countBuilder {
+func (t *Table) Count() *countBuilder {
 	return &countBuilder{
 		table: t,
-		ctx:   ctx,
+		ctx:   nil,
 	}
+}
+
+// WithContext sets the context for the query
+func (b *countBuilder) WithContext(ctx context.Context) *countBuilder {
+	b.ctx = ctx
+	return b
 }
 
 // EqualTo adds an equality filter to the query
@@ -540,12 +552,18 @@ type readBuilder struct {
 }
 
 // Read initiates the construction of a read query
-func (t *Table) Read(ctx context.Context, recordID int) *readBuilder {
+func (t *Table) Read(recordID int) *readBuilder {
 	return &readBuilder{
 		table:    t,
-		ctx:      ctx,
+		ctx:      nil,
 		recordID: recordID,
 	}
+}
+
+// WithContext sets the context for the query
+func (b *readBuilder) WithContext(ctx context.Context) *readBuilder {
+	b.ctx = ctx
+	return b
 }
 
 // Fields adds specific fields to the query
@@ -560,10 +578,10 @@ type ReadResponse struct {
 	Data map[string]any
 }
 
-// Decode converts the read response into a struct
+// DecodeInto converts the read response into a struct
 // It takes a pointer to a struct as destination and populates it with the data
-func (r ReadResponse) Decode(dest any) error {
-	return decode(r.Data, dest)
+func (r ReadResponse) DecodeInto(dest any) error {
+	return decodeInto(r.Data, dest)
 }
 
 // Execute executes the read query

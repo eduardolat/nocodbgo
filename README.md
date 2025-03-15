@@ -70,13 +70,16 @@ user := map[string]any{
     "Age": 30,
 }
 
-userID, err := table.Create(context.Background(), user)
+userID, err := table.Create(user).
+    WithContext(context.Background()).
+    Execute()
 if err != nil {
     // Handle error
 }
 
 // Read a record
-readResponse, err := table.Read(context.Background(), userID).
+readResponse, err := table.Read(userID).
+    WithContext(context.Background()).
     Fields("Name", "Email", "Age").
     Execute()
 if err != nil {
@@ -92,7 +95,7 @@ type User struct {
 }
 
 var userStruct User
-err = readResponse.Decode(&userStruct)
+err = readResponse.DecodeInto(&userStruct)
 if err != nil {
     // Handle error
 }
@@ -102,13 +105,17 @@ updateUser := map[string]any{
     "Name": "John Smith",
 }
 
-err = table.Update(context.Background(), userID, updateUser)
+err = table.Update(userID, updateUser).
+    WithContext(context.Background()).
+    Execute()
 if err != nil {
     // Handle error
 }
 
 // Delete a record
-err = table.Delete(context.Background(), userID)
+err = table.Delete(userID).
+    WithContext(context.Background()).
+    Execute()
 if err != nil {
     // Handle error
 }
@@ -118,8 +125,9 @@ if err != nil {
 
 ```go
 // List records with options using the chain pattern
-result, err := table.List(context.Background()).
-    GreaterThan("Age", 18).
+result, err := table.List().
+    WithContext(context.Background()).
+    GreaterThan("Age", "18").
     SortAsc("Name").
     Limit(10).
     Execute()
@@ -129,14 +137,15 @@ if err != nil {
 
 // Decode the list into a struct
 var users []User
-err = result.Decode(&users)
+err = result.DecodeInto(&users)
 if err != nil {
     // Handle error
 }
 
 // Count records
-count, err := table.Count(context.Background()).
-    GreaterThan("Age", 18).
+count, err := table.Count().
+    WithContext(context.Background()).
+    GreaterThan("Age", "18").
     Execute()
 if err != nil {
     // Handle error
@@ -147,10 +156,11 @@ if err != nil {
 
 ```go
 // Query with complex filters
-result, err := table.List(context.Background()).
+result, err := table.List().
+    WithContext(context.Background()).
     EqualTo("Name", "John Smith").
-    GreaterThan("Age", 18).
-    LessThan("Age", 30).
+    GreaterThan("Age", "18").
+    LessThan("Age", "30").
     SortAsc("Name").
     Limit(10).
     Execute()
@@ -176,7 +186,9 @@ bulkUsers := []map[string]any{
     },
 }
 
-createdUsers, err := table.BulkCreate(context.Background(), bulkUsers)
+createdUsers, err := table.BulkCreate(bulkUsers).
+    WithContext(context.Background()).
+    Execute()
 if err != nil {
     // Handle error
 }
@@ -193,13 +205,17 @@ bulkUpdateUsers := []map[string]any{
     },
 }
 
-err = table.BulkUpdate(context.Background(), bulkUpdateUsers)
+err = table.BulkUpdate(bulkUpdateUsers).
+    WithContext(context.Background()).
+    Execute()
 if err != nil {
     // Handle error
 }
 
 // Bulk delete records
-err = table.BulkDelete(context.Background(), createdUsers)
+err = table.BulkDelete(createdUsers).
+    WithContext(context.Background()).
+    Execute()
 if err != nil {
     // Handle error
 }

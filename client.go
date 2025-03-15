@@ -150,9 +150,34 @@ type Table struct {
 	tableID string
 }
 
-// Create creates a new record in a table and returns the ID
-func (t *Table) Create(ctx context.Context, data map[string]any) (int, error) {
-	records, err := t.BulkCreate(ctx, []map[string]any{data})
+// createBuilder is used to build a create query with a fluent API
+type createBuilder struct {
+	table *Table
+	ctx   context.Context
+	data  map[string]any
+}
+
+// Create initiates the construction of a create query
+func (t *Table) Create(data map[string]any) *createBuilder {
+	return &createBuilder{
+		table: t,
+		ctx:   nil,
+		data:  data,
+	}
+}
+
+// WithContext sets the context for the query
+func (b *createBuilder) WithContext(ctx context.Context) *createBuilder {
+	b.ctx = ctx
+	return b
+}
+
+// Execute executes the create query
+func (b *createBuilder) Execute() (int, error) {
+	records, err := b.table.
+		BulkCreate([]map[string]any{b.data}).
+		WithContext(b.ctx).
+		Execute()
 	if err != nil {
 		return 0, fmt.Errorf("failed to create record: %w", err)
 	}
@@ -164,20 +189,47 @@ func (t *Table) Create(ctx context.Context, data map[string]any) (int, error) {
 	return records[0], nil
 }
 
-// Update updates a record in a table
-func (t *Table) Update(ctx context.Context, recordID int, data map[string]any) error {
-	if recordID == 0 {
+// updateBuilder is used to build an update query with a fluent API
+type updateBuilder struct {
+	table    *Table
+	ctx      context.Context
+	recordID int
+	data     map[string]any
+}
+
+// Update initiates the construction of an update query
+func (t *Table) Update(recordID int, data map[string]any) *updateBuilder {
+	return &updateBuilder{
+		table:    t,
+		ctx:      nil,
+		recordID: recordID,
+		data:     data,
+	}
+}
+
+// WithContext sets the context for the query
+func (b *updateBuilder) WithContext(ctx context.Context) *updateBuilder {
+	b.ctx = ctx
+	return b
+}
+
+// Execute executes the update query
+func (b *updateBuilder) Execute() error {
+	if b.recordID == 0 {
 		return ErrRowIDRequired
 	}
 
 	// Add ID to the data
 	updateData := make(map[string]any)
-	for k, v := range data {
+	for k, v := range b.data {
 		updateData[k] = v
 	}
-	updateData["Id"] = recordID
+	updateData["Id"] = b.recordID
 
-	err := t.BulkUpdate(ctx, []map[string]any{updateData})
+	err := b.table.
+		BulkUpdate([]map[string]any{updateData}).
+		WithContext(b.ctx).
+		Execute()
 	if err != nil {
 		return fmt.Errorf("failed to update record: %w", err)
 	}
@@ -185,13 +237,38 @@ func (t *Table) Update(ctx context.Context, recordID int, data map[string]any) e
 	return nil
 }
 
-// Delete deletes a record from a table
-func (t *Table) Delete(ctx context.Context, recordID int) error {
-	if recordID == 0 {
+// deleteBuilder is used to build a delete query with a fluent API
+type deleteBuilder struct {
+	table    *Table
+	ctx      context.Context
+	recordID int
+}
+
+// Delete initiates the construction of a delete query
+func (t *Table) Delete(recordID int) *deleteBuilder {
+	return &deleteBuilder{
+		table:    t,
+		ctx:      nil,
+		recordID: recordID,
+	}
+}
+
+// WithContext sets the context for the query
+func (b *deleteBuilder) WithContext(ctx context.Context) *deleteBuilder {
+	b.ctx = ctx
+	return b
+}
+
+// Execute executes the delete query
+func (b *deleteBuilder) Execute() error {
+	if b.recordID == 0 {
 		return ErrRowIDRequired
 	}
 
-	err := t.BulkDelete(ctx, []int{recordID})
+	err := b.table.
+		BulkDelete([]int{b.recordID}).
+		WithContext(b.ctx).
+		Execute()
 	if err != nil {
 		return fmt.Errorf("failed to delete record: %w", err)
 	}
@@ -199,10 +276,32 @@ func (t *Table) Delete(ctx context.Context, recordID int) error {
 	return nil
 }
 
-// BulkCreate creates multiple records in a table and returns the IDs
-func (t *Table) BulkCreate(ctx context.Context, data []map[string]any) ([]int, error) {
-	path := fmt.Sprintf("/api/v2/tables/%s/records", t.tableID)
-	respBody, err := t.client.request(ctx, http.MethodPost, path, data, nil)
+// bulkCreateBuilder is used to build a bulk create query with a fluent API
+type bulkCreateBuilder struct {
+	table *Table
+	ctx   context.Context
+	data  []map[string]any
+}
+
+// BulkCreate initiates the construction of a bulk create query
+func (t *Table) BulkCreate(data []map[string]any) *bulkCreateBuilder {
+	return &bulkCreateBuilder{
+		table: t,
+		ctx:   nil,
+		data:  data,
+	}
+}
+
+// WithContext sets the context for the query
+func (b *bulkCreateBuilder) WithContext(ctx context.Context) *bulkCreateBuilder {
+	b.ctx = ctx
+	return b
+}
+
+// Execute executes the bulk create query
+func (b *bulkCreateBuilder) Execute() ([]int, error) {
+	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)
+	respBody, err := b.table.client.request(b.ctx, http.MethodPost, path, b.data, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create records: %w", err)
 	}
@@ -222,10 +321,32 @@ func (t *Table) BulkCreate(ctx context.Context, data []map[string]any) ([]int, e
 	return ids, nil
 }
 
-// BulkUpdate updates multiple records in a table
-func (t *Table) BulkUpdate(ctx context.Context, data []map[string]any) error {
-	path := fmt.Sprintf("/api/v2/tables/%s/records", t.tableID)
-	_, err := t.client.request(ctx, http.MethodPatch, path, data, nil)
+// bulkUpdateBuilder is used to build a bulk update query with a fluent API
+type bulkUpdateBuilder struct {
+	table *Table
+	ctx   context.Context
+	data  []map[string]any
+}
+
+// BulkUpdate initiates the construction of a bulk update query
+func (t *Table) BulkUpdate(data []map[string]any) *bulkUpdateBuilder {
+	return &bulkUpdateBuilder{
+		table: t,
+		ctx:   nil,
+		data:  data,
+	}
+}
+
+// WithContext sets the context for the query
+func (b *bulkUpdateBuilder) WithContext(ctx context.Context) *bulkUpdateBuilder {
+	b.ctx = ctx
+	return b
+}
+
+// Execute executes the bulk update query
+func (b *bulkUpdateBuilder) Execute() error {
+	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)
+	_, err := b.table.client.request(b.ctx, http.MethodPatch, path, b.data, nil)
 	if err != nil {
 		return fmt.Errorf("failed to update records: %w", err)
 	}
@@ -233,20 +354,42 @@ func (t *Table) BulkUpdate(ctx context.Context, data []map[string]any) error {
 	return nil
 }
 
-// BulkDelete deletes multiple records from a table
-func (t *Table) BulkDelete(ctx context.Context, recordIDs []int) error {
-	if len(recordIDs) == 0 {
+// bulkDeleteBuilder is used to build a bulk delete query with a fluent API
+type bulkDeleteBuilder struct {
+	table     *Table
+	ctx       context.Context
+	recordIDs []int
+}
+
+// BulkDelete initiates the construction of a bulk delete query
+func (t *Table) BulkDelete(recordIDs []int) *bulkDeleteBuilder {
+	return &bulkDeleteBuilder{
+		table:     t,
+		ctx:       nil,
+		recordIDs: recordIDs,
+	}
+}
+
+// WithContext sets the context for the query
+func (b *bulkDeleteBuilder) WithContext(ctx context.Context) *bulkDeleteBuilder {
+	b.ctx = ctx
+	return b
+}
+
+// Execute executes the bulk delete query
+func (b *bulkDeleteBuilder) Execute() error {
+	if len(b.recordIDs) == 0 {
 		return nil
 	}
 
 	// Convert IDs to the format expected by the API
-	ids := make([]map[string]any, len(recordIDs))
-	for i, id := range recordIDs {
+	ids := make([]map[string]any, len(b.recordIDs))
+	for i, id := range b.recordIDs {
 		ids[i] = map[string]any{"Id": id}
 	}
 
-	path := fmt.Sprintf("/api/v2/tables/%s/records", t.tableID)
-	_, err := t.client.request(ctx, http.MethodDelete, path, ids, nil)
+	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)
+	_, err := b.table.client.request(b.ctx, http.MethodDelete, path, ids, nil)
 	if err != nil {
 		return fmt.Errorf("failed to delete records: %w", err)
 	}

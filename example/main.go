@@ -38,13 +38,16 @@ func main() {
 		"Number":         30,
 	}
 
-	userID, err := table.Create(context.Background(), user)
+	userID, err := table.Create(user).
+		WithContext(context.Background()).
+		Execute()
 	if err != nil {
 		log.Fatalf("Error creating user: %v", err)
 	}
 
 	// Read the user using the chain pattern
-	readResponse, err := table.Read(context.Background(), userID).
+	readResponse, err := table.Read(userID).
+		WithContext(context.Background()).
 		Fields("SingleLineText", "Email", "Number").
 		Execute()
 	if err != nil {
@@ -55,7 +58,7 @@ func main() {
 
 	// Decode the user into a struct
 	var userStruct User
-	err = readResponse.Decode(&userStruct)
+	err = readResponse.DecodeInto(&userStruct)
 	if err != nil {
 		log.Fatalf("Error decoding user: %v", err)
 	}
@@ -67,13 +70,16 @@ func main() {
 		"SingleLineText": "John Smith",
 	}
 
-	err = table.Update(context.Background(), userID, updateUser)
+	err = table.Update(userID, updateUser).
+		WithContext(context.Background()).
+		Execute()
 	if err != nil {
 		log.Fatalf("Error updating user: %v", err)
 	}
 
 	// List users with filters using the chain pattern
-	listResponse, err := table.List(context.Background()).
+	listResponse, err := table.List().
+		WithContext(context.Background()).
 		GreaterThan("Number", "18").
 		SortAsc("SingleLineText").
 		Limit(10).
@@ -90,7 +96,7 @@ func main() {
 
 	// Decode the list of users into a struct
 	var users []User
-	err = listResponse.Decode(&users)
+	err = listResponse.DecodeInto(&users)
 	if err != nil {
 		log.Fatalf("Error decoding users: %v", err)
 	}
@@ -98,7 +104,8 @@ func main() {
 	fmt.Printf("Decoded users: %+v\n", users)
 
 	// Count users using the chain pattern
-	count, err := table.Count(context.Background()).
+	count, err := table.Count().
+		WithContext(context.Background()).
 		GreaterThan("Number", "18").
 		Execute()
 	if err != nil {
@@ -108,7 +115,9 @@ func main() {
 	fmt.Printf("User count: %d\n", count)
 
 	// Delete the user
-	err = table.Delete(context.Background(), userID)
+	err = table.Delete(userID).
+		WithContext(context.Background()).
+		Execute()
 	if err != nil {
 		log.Fatalf("Error deleting user: %v", err)
 	}
@@ -129,7 +138,9 @@ func main() {
 		},
 	}
 
-	createdUsers, err := table.BulkCreate(context.Background(), bulkUsers)
+	createdUsers, err := table.BulkCreate(bulkUsers).
+		WithContext(context.Background()).
+		Execute()
 	if err != nil {
 		log.Fatalf("Error bulk creating users: %v", err)
 	}
@@ -148,7 +159,9 @@ func main() {
 		},
 	}
 
-	err = table.BulkUpdate(context.Background(), bulkUpdateUsers)
+	err = table.BulkUpdate(bulkUpdateUsers).
+		WithContext(context.Background()).
+		Execute()
 	if err != nil {
 		log.Fatalf("Error bulk updating users: %v", err)
 	}
@@ -156,7 +169,9 @@ func main() {
 	fmt.Println("Users updated")
 
 	// Bulk delete users
-	err = table.BulkDelete(context.Background(), createdUsers)
+	err = table.BulkDelete(createdUsers).
+		WithContext(context.Background()).
+		Execute()
 	if err != nil {
 		log.Fatalf("Error bulk deleting users: %v", err)
 	}
@@ -164,7 +179,8 @@ func main() {
 	fmt.Println("Users deleted")
 
 	// Complex filtering using the chain pattern
-	complexResult, err := table.List(context.Background()).
+	complexResult, err := table.List().
+		WithContext(context.Background()).
 		EqualTo("SingleLineText", "John Smith").
 		GreaterThan("Number", "18").
 		LessThan("Number", "30").
@@ -182,7 +198,8 @@ func main() {
 	)
 
 	// Using the Where method for custom filter expressions
-	customFilterResult, err := table.List(context.Background()).
+	customFilterResult, err := table.List().
+		WithContext(context.Background()).
 		Where("(Number,gt,20)~or(Email,like,%@example.com)").
 		SortDesc("Number").
 		Limit(5).
@@ -194,7 +211,8 @@ func main() {
 	fmt.Printf("Users with custom filter: %v\n", customFilterResult.List)
 
 	// Using Where with Count
-	customFilterCount, err := table.Count(context.Background()).
+	customFilterCount, err := table.Count().
+		WithContext(context.Background()).
 		Where("(SingleLineText,like,%Smith)~and(Number,gt,20)").
 		Execute()
 	if err != nil {

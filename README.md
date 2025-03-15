@@ -1,8 +1,24 @@
 # NocoDB Golang Client
 
-A Go client for the [NocoDB API](https://nocodb.com/). This client provides a
-simple and intuitive way to interact with the NocoDB API using a fluent chain
-pattern.
+<p>
+  <a href="https://goreportcard.com/report/eduardolat/nocodbgo">
+    <img src="https://goreportcard.com/badge/eduardolat/nocodbgo" alt="Go Report Card"/>
+  </a>
+  <a href="https://github.com/eduardolat/nocodbgo/releases/latest">
+    <img src="https://img.shields.io/github/release/eduardolat/nocodbgo.svg" alt="Release Version"/>
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/eduardolat/nocodbgo.svg" alt="License"/>
+  </a>
+  <a href="https://github.com/eduardolat/nocodbgo">
+    <img src="https://img.shields.io/github/stars/eduardolat/nocodbgo?style=flat&label=github+stars"/>
+  </a>
+</p>
+
+A Go client for the
+[NocoDB API](https://docs.nocodb.com/developer-resources/rest-APIs/overview).
+This client provides a simple and intuitive way to interact with the NocoDB API
+using a fluent chain pattern.
 
 ## Installation
 

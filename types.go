@@ -2,14 +2,10 @@ package nocodbgo
 
 import (
 	"fmt"
-	"net/url"
 )
 
-// QueryOption is a function that configures a query
-type QueryOption func(url.Values)
-
-// PageInfo contains pagination information
-type PageInfo struct {
+// pageInfo contains pagination information
+type pageInfo struct {
 	TotalRows   int  `json:"totalRows"`
 	Page        int  `json:"page"`
 	PageSize    int  `json:"pageSize"`
@@ -17,14 +13,14 @@ type PageInfo struct {
 	IsLastPage  bool `json:"isLastPage"`
 }
 
-// ListResponse is the response from a list request
-type ListResponse struct {
+// listResponse is the response from a list query
+type listResponse struct {
 	List     []map[string]any `json:"list"`
-	PageInfo PageInfo         `json:"pageInfo"`
+	PageInfo pageInfo         `json:"pageInfo"`
 }
 
-// CountResponse is the response from a count request
-type CountResponse struct {
+// countResponse is the response from a count query
+type countResponse struct {
 	Count int `json:"count"`
 }
 
@@ -43,103 +39,91 @@ func (e APIError) Error() string {
 }
 
 // ComparisonOperator represents a comparison operator
-type ComparisonOperator string
+type comparisonOperator string
 
 const (
-	// Equal operator
-	Equal ComparisonOperator = "eq"
-	// NotEqual operator
-	NotEqual ComparisonOperator = "neq"
-	// GreaterThan operator
-	GreaterThan ComparisonOperator = "gt"
-	// GreaterThanOrEqual operator
-	GreaterThanOrEqual ComparisonOperator = "ge"
-	// LessThan operator
-	LessThan ComparisonOperator = "lt"
-	// LessThanOrEqual operator
-	LessThanOrEqual ComparisonOperator = "le"
-	// Is operator
-	Is ComparisonOperator = "is"
-	// IsNot operator
-	IsNot ComparisonOperator = "isnot"
-	// In operator
-	In ComparisonOperator = "in"
-	// Between operator
-	Between ComparisonOperator = "btw"
-	// NotBetween operator
-	NotBetween ComparisonOperator = "nbtw"
-	// Like operator
-	Like ComparisonOperator = "like"
-	// NotLike operator
-	NotLike ComparisonOperator = "nlike"
-	// IsWithin operator
-	IsWithin ComparisonOperator = "isWithin"
-	// AllOf operator
-	AllOf ComparisonOperator = "allof"
-	// AnyOf operator
-	AnyOf ComparisonOperator = "anyof"
-	// NotAllOf operator
-	NotAllOf ComparisonOperator = "nallof"
-	// NotAnyOf operator
-	NotAnyOf ComparisonOperator = "nanyof"
+	// Equal operator for equality
+	Equal comparisonOperator = "eq"
+	// NotEqual operator for inequality
+	NotEqual comparisonOperator = "neq"
+	// GreaterThan operator for greater than
+	GreaterThan comparisonOperator = "gt"
+	// GreaterThanOrEqual operator for greater than or equal
+	GreaterThanOrEqual comparisonOperator = "ge"
+	// LessThan operator for less than
+	LessThan comparisonOperator = "lt"
+	// LessThanOrEqual operator for less than or equal
+	LessThanOrEqual comparisonOperator = "le"
+	// Is operator for is
+	Is comparisonOperator = "is"
+	// IsNot operator for is not
+	IsNot comparisonOperator = "isnot"
+	// In operator for in
+	In comparisonOperator = "in"
+	// Between operator for between
+	Between comparisonOperator = "btw"
+	// NotBetween operator for not between
+	NotBetween comparisonOperator = "nbtw"
+	// Like operator for like
+	Like comparisonOperator = "like"
+	// NotLike operator for not like
+	NotLike comparisonOperator = "nlike"
+	// IsWithin operator for is within
+	IsWithin comparisonOperator = "isWithin"
+	// AllOf operator for all of
+	AllOf comparisonOperator = "allof"
+	// AnyOf operator for any of
+	AnyOf comparisonOperator = "anyof"
+	// NotAllOf operator for not all of
+	NotAllOf comparisonOperator = "nallof"
+	// NotAnyOf operator for not any of
+	NotAnyOf comparisonOperator = "nanyof"
 )
 
-// LogicalOperator represents a logical operator
-type LogicalOperator string
+// dateSubOperator represents a date sub-operator
+type dateSubOperator string
 
 const (
-	// And operator
-	And LogicalOperator = "~and"
-	// Or operator
-	Or LogicalOperator = "~or"
-	// Not operator
-	Not LogicalOperator = "~not"
+	// Today sub-operator for today
+	Today dateSubOperator = "today"
+	// Tomorrow sub-operator for tomorrow
+	Tomorrow dateSubOperator = "tomorrow"
+	// Yesterday sub-operator for yesterday
+	Yesterday dateSubOperator = "yesterday"
+	// OneWeekAgo sub-operator for one week ago
+	OneWeekAgo dateSubOperator = "oneWeekAgo"
+	// OneWeekFromNow sub-operator for one week from now
+	OneWeekFromNow dateSubOperator = "oneWeekFromNow"
+	// OneMonthAgo sub-operator for one month ago
+	OneMonthAgo dateSubOperator = "oneMonthAgo"
+	// OneMonthFromNow sub-operator for one month from now
+	OneMonthFromNow dateSubOperator = "oneMonthFromNow"
+	// DaysAgo sub-operator for days ago
+	DaysAgo dateSubOperator = "daysAgo"
+	// DaysFromNow sub-operator for days from now
+	DaysFromNow dateSubOperator = "daysFromNow"
+	// ExactDate sub-operator for exact date
+	ExactDate dateSubOperator = "exactDate"
 )
 
-// DateSubOperator represents a date sub-operator
-type DateSubOperator string
+// dateWithinSubOperator represents a date within sub-operator
+type dateWithinSubOperator string
 
 const (
-	// Today sub-operator
-	Today DateSubOperator = "today"
-	// Tomorrow sub-operator
-	Tomorrow DateSubOperator = "tomorrow"
-	// Yesterday sub-operator
-	Yesterday DateSubOperator = "yesterday"
-	// OneWeekAgo sub-operator
-	OneWeekAgo DateSubOperator = "oneWeekAgo"
-	// OneWeekFromNow sub-operator
-	OneWeekFromNow DateSubOperator = "oneWeekFromNow"
-	// OneMonthAgo sub-operator
-	OneMonthAgo DateSubOperator = "oneMonthAgo"
-	// OneMonthFromNow sub-operator
-	OneMonthFromNow DateSubOperator = "oneMonthFromNow"
-	// DaysAgo sub-operator
-	DaysAgo DateSubOperator = "daysAgo"
-	// DaysFromNow sub-operator
-	DaysFromNow DateSubOperator = "daysFromNow"
-	// ExactDate sub-operator
-	ExactDate DateSubOperator = "exactDate"
-)
-
-// DateWithinSubOperator represents a date within sub-operator
-type DateWithinSubOperator string
-
-const (
-	// PastWeek sub-operator
-	PastWeek DateWithinSubOperator = "pastWeek"
-	// PastMonth sub-operator
-	PastMonth DateWithinSubOperator = "pastMonth"
-	// PastYear sub-operator
-	PastYear DateWithinSubOperator = "pastYear"
-	// NextWeek sub-operator
-	NextWeek DateWithinSubOperator = "nextWeek"
-	// NextMonth sub-operator
-	NextMonth DateWithinSubOperator = "nextMonth"
-	// NextYear sub-operator
-	NextYear DateWithinSubOperator = "nextYear"
-	// NextNumberOfDays sub-operator
-	NextNumberOfDays DateWithinSubOperator = "nextNumberOfDays"
-	// PastNumberOfDays sub-operator
-	PastNumberOfDays DateWithinSubOperator = "pastNumberOfDays"
+	// PastWeek sub-operator for past week
+	PastWeek dateWithinSubOperator = "pastWeek"
+	// PastMonth sub-operator for past month
+	PastMonth dateWithinSubOperator = "pastMonth"
+	// PastYear sub-operator for past year
+	PastYear dateWithinSubOperator = "pastYear"
+	// NextWeek sub-operator for next week
+	NextWeek dateWithinSubOperator = "nextWeek"
+	// NextMonth sub-operator for next month
+	NextMonth dateWithinSubOperator = "nextMonth"
+	// NextYear sub-operator for next year
+	NextYear dateWithinSubOperator = "nextYear"
+	// NextNumberOfDays sub-operator for next number of days
+	NextNumberOfDays dateWithinSubOperator = "nextNumberOfDays"
+	// PastNumberOfDays sub-operator for past number of days
+	PastNumberOfDays dateWithinSubOperator = "pastNumberOfDays"
 )

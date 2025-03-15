@@ -15,7 +15,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -24,10 +23,6 @@ const (
 	// defaultTimeout is the default timeout for HTTP requests
 	defaultTimeout = 30 * time.Second
 )
-
-/******************
- * Client Options *
- *****************/
 
 // Client is the NocoDB API client
 type Client struct {
@@ -41,66 +36,11 @@ type Client struct {
 	httpClient *http.Client
 }
 
-// ClientOption is a function that configures a Client
-type ClientOption func(*Client)
-
-// WithBaseURL sets the base URL for the client
-func WithBaseURL(baseURL string) ClientOption {
-	return func(c *Client) {
-		// Ensure the base URL doesn't end with a slash
-		c.baseURL = strings.TrimSuffix(baseURL, "/")
-	}
-}
-
-// WithAPIToken sets the API token for the client
-func WithAPIToken(apiToken string) ClientOption {
-	return func(c *Client) {
-		c.apiToken = apiToken
-	}
-}
-
-// WithHTTPClient sets the HTTP client for the client
-func WithHTTPClient(httpClient *http.Client) ClientOption {
-	return func(c *Client) {
-		c.httpClient = httpClient
-	}
-}
-
-// WithHTTPTimeout sets the timeout for the HTTP client
-func WithHTTPTimeout(timeout time.Duration) ClientOption {
-	return func(c *Client) {
-		if c.httpClient == nil {
-			c.httpClient = &http.Client{}
-		}
-		c.httpClient.Timeout = timeout
-	}
-}
-
-// NewClient creates a new NocoDB client with the given options
-func NewClient(clientOptions ...ClientOption) (*Client, error) {
-	client := &Client{
-		baseURL:    "",
-		apiToken:   "",
+// NewClient creates a new client builder
+func NewClient() *ClientBuilder {
+	return &ClientBuilder{
 		httpClient: &http.Client{Timeout: defaultTimeout},
 	}
-
-	for _, clientOptionFn := range clientOptions {
-		clientOptionFn(client)
-	}
-
-	if client.baseURL == "" {
-		return nil, ErrBaseURLRequired
-	}
-
-	if client.apiToken == "" {
-		return nil, ErrAPITokenRequired
-	}
-
-	if client.httpClient == nil {
-		return nil, ErrHTTPClientRequired
-	}
-
-	return client, nil
 }
 
 // request makes an HTTP request to the NocoDB API, it includes the api token in the request header
@@ -155,24 +95,6 @@ func (c *Client) request(ctx context.Context, method string, path string, body a
 	return respBody, nil
 }
 
-// buildTablePath builds the path for table API endpoints
-func (c *Client) buildTablePath(tableID string, recordID string) string {
-	if recordID != "" {
-		return fmt.Sprintf("/api/v2/tables/%s/records/%s", tableID, recordID)
-	}
-	return fmt.Sprintf("/api/v2/tables/%s/records", tableID)
-}
-
-/********************
- * Table Operations *
- *******************/
-
-// Table represents a table in NocoDB
-type Table struct {
-	client  *Client
-	tableID string
-}
-
 // Table returns a new table with the given ID
 func (c *Client) Table(tableID string) *Table {
 	return &Table{
@@ -181,46 +103,10 @@ func (c *Client) Table(tableID string) *Table {
 	}
 }
 
-// List retrieves a list of records from a table
-func (t *Table) List(ctx context.Context, options ...QueryOption) (ListResponse, error) {
-	query := url.Values{}
-	for _, option := range options {
-		option(query)
-	}
-
-	path := t.client.buildTablePath(t.tableID, "")
-	respBody, err := t.client.request(ctx, http.MethodGet, path, nil, query)
-	if err != nil {
-		return ListResponse{}, fmt.Errorf("failed to list records: %w", err)
-	}
-
-	var response ListResponse
-	if err := json.Unmarshal(respBody, &response); err != nil {
-		return ListResponse{}, fmt.Errorf("failed to unmarshal list response: %w", err)
-	}
-
-	return response, nil
-}
-
-// Count returns the number of records in a table
-func (t *Table) Count(ctx context.Context, options ...QueryOption) (int, error) {
-	query := url.Values{}
-	for _, option := range options {
-		option(query)
-	}
-
-	path := t.client.buildTablePath(t.tableID, "") + "/count"
-	respBody, err := t.client.request(ctx, http.MethodGet, path, nil, query)
-	if err != nil {
-		return 0, fmt.Errorf("failed to count records: %w", err)
-	}
-
-	var response CountResponse
-	if err := json.Unmarshal(respBody, &response); err != nil {
-		return 0, fmt.Errorf("failed to unmarshal count response: %w", err)
-	}
-
-	return response.Count, nil
+// Table represents a table in NocoDB
+type Table struct {
+	client  *Client
+	tableID string
 }
 
 // Create creates a new record in a table and returns the ID
@@ -237,81 +123,49 @@ func (t *Table) Create(ctx context.Context, data map[string]any) (int, error) {
 	return records[0], nil
 }
 
-// Read retrieves a record by ID from a table
-func (t *Table) Read(ctx context.Context, recordID int, options ...QueryOption) (map[string]any, error) {
-	if recordID == 0 {
-		return nil, ErrRowIDRequired
-	}
-
-	query := url.Values{}
-	for _, option := range options {
-		option(query)
-	}
-
-	path := t.client.buildTablePath(t.tableID, strconv.Itoa(recordID))
-	respBody, err := t.client.request(ctx, http.MethodGet, path, nil, query)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read record: %w", err)
-	}
-
-	var response map[string]any
-	if err := json.Unmarshal(respBody, &response); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal read response: %w", err)
-	}
-
-	return response, nil
-}
-
-// Update updates a record by ID in a table
+// Update updates a record in a table
 func (t *Table) Update(ctx context.Context, recordID int, data map[string]any) error {
 	if recordID == 0 {
 		return ErrRowIDRequired
 	}
 
-	// Add the ID to the data for bulk update
+	// Add ID to the data
 	updateData := make(map[string]any)
 	for k, v := range data {
 		updateData[k] = v
 	}
 	updateData["Id"] = recordID
 
-	err := t.BulkUpdate(ctx, []map[string]any{updateData})
-	if err != nil {
-		return fmt.Errorf("failed to update record: %w", err)
-	}
-
-	return nil
+	return t.BulkUpdate(ctx, []map[string]any{updateData})
 }
 
-// Delete deletes a record by ID from a table
+// Delete deletes a record from a table
 func (t *Table) Delete(ctx context.Context, recordID int) error {
 	if recordID == 0 {
 		return ErrRowIDRequired
 	}
 
-	return t.BulkDelete(ctx, []map[string]any{{"Id": strconv.Itoa(recordID)}})
+	return t.BulkDelete(ctx, []int{recordID})
 }
 
-// BulkCreate creates multiple records in a table
+// BulkCreate creates multiple records in a table and returns the IDs
 func (t *Table) BulkCreate(ctx context.Context, data []map[string]any) ([]int, error) {
-	path := t.client.buildTablePath(t.tableID, "")
+	path := fmt.Sprintf("/api/v2/tables/%s/records", t.tableID)
 	respBody, err := t.client.request(ctx, http.MethodPost, path, data, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create records: %w", err)
+		return nil, fmt.Errorf("failed to bulk create records: %w", err)
 	}
 
 	var response []map[string]any
 	if err := json.Unmarshal(respBody, &response); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal create response: %w", err)
+		return nil, fmt.Errorf("failed to unmarshal bulk create response: %w", err)
 	}
 
-	ids := make([]int, len(response))
-	for i, record := range response {
-		id, ok := record["Id"].(int)
-		if !ok {
-			return nil, fmt.Errorf("created record ID is not an integer for record %d", i+1)
+	var ids []int
+	for _, record := range response {
+		if id, ok := record["Id"].(float64); ok {
+			ids = append(ids, int(id))
 		}
-		ids[i] = id
 	}
 
 	return ids, nil
@@ -319,31 +173,47 @@ func (t *Table) BulkCreate(ctx context.Context, data []map[string]any) ([]int, e
 
 // BulkUpdate updates multiple records in a table
 func (t *Table) BulkUpdate(ctx context.Context, data []map[string]any) error {
-	path := t.client.buildTablePath(t.tableID, "")
-	respBody, err := t.client.request(ctx, http.MethodPatch, path, data, nil)
+	path := fmt.Sprintf("/api/v2/tables/%s/records", t.tableID)
+	_, err := t.client.request(ctx, http.MethodPatch, path, data, nil)
 	if err != nil {
-		return fmt.Errorf("failed to update records: %w", err)
-	}
-
-	var response []map[string]any
-	if err := json.Unmarshal(respBody, &response); err != nil {
-		return fmt.Errorf("failed to unmarshal update response: %w", err)
-	}
-
-	if len(response) != len(data) {
-		return fmt.Errorf("number of updated records does not match number of records in request")
+		return fmt.Errorf("failed to bulk update records: %w", err)
 	}
 
 	return nil
 }
 
-// BulkDelete deletes multiple records in a table
-func (t *Table) BulkDelete(ctx context.Context, ids []map[string]any) error {
-	path := t.client.buildTablePath(t.tableID, "")
+// BulkDelete deletes multiple records from a table
+func (t *Table) BulkDelete(ctx context.Context, recordIDs []int) error {
+	if len(recordIDs) == 0 {
+		return nil
+	}
 
+	// Convert IDs to the format expected by the API
+	ids := make([]map[string]any, len(recordIDs))
+	for i, id := range recordIDs {
+		ids[i] = map[string]any{"Id": id}
+	}
+
+	path := fmt.Sprintf("/api/v2/tables/%s/records", t.tableID)
 	_, err := t.client.request(ctx, http.MethodDelete, path, ids, nil)
 	if err != nil {
-		return fmt.Errorf("failed to delete records: %w", err)
+		return fmt.Errorf("failed to bulk delete records: %w", err)
+	}
+
+	return nil
+}
+
+// decode is a helper function to decode data into a destination struct
+func decode(data any, dest any) error {
+	// Convert the data to JSON
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return fmt.Errorf("failed to marshal data: %w", err)
+	}
+
+	// Unmarshal the JSON into the destination
+	if err := json.Unmarshal(jsonData, dest); err != nil {
+		return fmt.Errorf("failed to unmarshal data: %w", err)
 	}
 
 	return nil

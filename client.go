@@ -15,6 +15,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -242,8 +243,8 @@ func (t *Table) Create(ctx context.Context, data map[string]any) (int, error) {
 }
 
 // Read retrieves a record by ID from a table
-func (t *Table) Read(ctx context.Context, recordID string, options ...QueryOption) (map[string]any, error) {
-	if recordID == "" {
+func (t *Table) Read(ctx context.Context, recordID int, options ...QueryOption) (map[string]any, error) {
+	if recordID == 0 {
 		return nil, ErrRowIDRequired
 	}
 
@@ -252,7 +253,7 @@ func (t *Table) Read(ctx context.Context, recordID string, options ...QueryOptio
 		option(query)
 	}
 
-	path := t.client.buildTablePath(t.tableID, recordID)
+	path := t.client.buildTablePath(t.tableID, strconv.Itoa(recordID))
 	respBody, err := t.client.request(ctx, http.MethodGet, path, nil, query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read record: %w", err)
@@ -267,8 +268,8 @@ func (t *Table) Read(ctx context.Context, recordID string, options ...QueryOptio
 }
 
 // Update updates a record by ID in a table
-func (t *Table) Update(ctx context.Context, recordID string, data map[string]any) error {
-	if recordID == "" {
+func (t *Table) Update(ctx context.Context, recordID int, data map[string]any) error {
+	if recordID == 0 {
 		return ErrRowIDRequired
 	}
 
@@ -288,12 +289,12 @@ func (t *Table) Update(ctx context.Context, recordID string, data map[string]any
 }
 
 // Delete deletes a record by ID from a table
-func (t *Table) Delete(ctx context.Context, recordID string) error {
-	if recordID == "" {
+func (t *Table) Delete(ctx context.Context, recordID int) error {
+	if recordID == 0 {
 		return ErrRowIDRequired
 	}
 
-	return t.BulkDelete(ctx, []map[string]any{{"Id": recordID}})
+	return t.BulkDelete(ctx, []map[string]any{{"Id": strconv.Itoa(recordID)}})
 }
 
 // BulkCreate creates multiple records in a table

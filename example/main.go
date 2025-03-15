@@ -74,7 +74,7 @@ func main() {
 
 	// List users with filters using the chain pattern
 	listResponse, err := table.List(context.Background()).
-		GreaterThan("Number", 18).
+		GreaterThan("Number", "18").
 		SortAsc("SingleLineText").
 		Limit(10).
 		Execute()
@@ -99,7 +99,7 @@ func main() {
 
 	// Count users using the chain pattern
 	count, err := table.Count(context.Background()).
-		GreaterThan("Number", 18).
+		GreaterThan("Number", "18").
 		Execute()
 	if err != nil {
 		log.Fatalf("Error counting users: %v", err)
@@ -166,8 +166,8 @@ func main() {
 	// Complex filtering using the chain pattern
 	complexResult, err := table.List(context.Background()).
 		EqualTo("SingleLineText", "John Smith").
-		GreaterThan("Number", 18).
-		LessThan("Number", 30).
+		GreaterThan("Number", "18").
+		LessThan("Number", "30").
 		SortAsc("SingleLineText").
 		Limit(10).
 		Execute()

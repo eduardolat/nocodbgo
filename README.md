@@ -1,6 +1,9 @@
 # NocoDB Golang Client
 
 <p>
+  <a href="https://pkg.go.dev/github.com/eduardolat/nocodbgo">
+    <img src="https://pkg.go.dev/badge/github.com/eduardolat/nocodbgo" alt="Go Reference"/>
+  </a>
   <a href="https://goreportcard.com/report/eduardolat/nocodbgo">
     <img src="https://goreportcard.com/badge/eduardolat/nocodbgo" alt="Go Report Card"/>
   </a>

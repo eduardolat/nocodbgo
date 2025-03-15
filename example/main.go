@@ -18,7 +18,6 @@ type User struct {
 }
 
 func main() {
-
 	// Create a new client for NocoDB API v2 using the chain pattern
 	client, err := nocodbgo.NewClient().
 		WithBaseURL("https://example.com").
@@ -33,7 +32,7 @@ func main() {
 	table := client.Table("your-table-id")
 
 	// Create a user
-	user := map[string]interface{}{
+	user := map[string]any{
 		"SingleLineText": "John Doe",
 		"Email":          "john@example.com",
 		"Number":         30,
@@ -64,7 +63,7 @@ func main() {
 	fmt.Printf("Decoded user: %+v\n", userStruct)
 
 	// Update the user
-	updateUser := map[string]interface{}{
+	updateUser := map[string]any{
 		"SingleLineText": "John Smith",
 	}
 
@@ -74,7 +73,7 @@ func main() {
 	}
 
 	// List users with filters using the chain pattern
-	result, err := table.List(context.Background()).
+	listResponse, err := table.List(context.Background()).
 		GreaterThan("Number", 18).
 		SortAsc("SingleLineText").
 		Limit(10).
@@ -83,13 +82,15 @@ func main() {
 		log.Fatalf("Error listing users: %v", err)
 	}
 
-	fmt.Printf("Users: %v\n", result.List)
-	fmt.Printf("Page Info: Total Rows: %d, Page: %d, Page Size: %d, Is First Page: %t, Is Last Page: %t\n",
-		result.PageInfo.TotalRows, result.PageInfo.Page, result.PageInfo.PageSize, result.PageInfo.IsFirstPage, result.PageInfo.IsLastPage)
+	fmt.Printf("Users: %v\n", listResponse.List)
+	fmt.Printf(
+		"Page Info: Total Rows: %d, Page: %d, Page Size: %d, Is First Page: %t, Is Last Page: %t\n",
+		listResponse.PageInfo.TotalRows, listResponse.PageInfo.Page, listResponse.PageInfo.PageSize, listResponse.PageInfo.IsFirstPage, listResponse.PageInfo.IsLastPage,
+	)
 
 	// Decode the list of users into a struct
 	var users []User
-	err = result.Decode(&users)
+	err = listResponse.Decode(&users)
 	if err != nil {
 		log.Fatalf("Error decoding users: %v", err)
 	}
@@ -115,7 +116,7 @@ func main() {
 	fmt.Println("User deleted")
 
 	// Bulk create users
-	bulkUsers := []map[string]interface{}{
+	bulkUsers := []map[string]any{
 		{
 			"SingleLineText": "Jane Doe",
 			"Email":          "jane@example.com",
@@ -136,7 +137,7 @@ func main() {
 	fmt.Printf("Created users: %v\n", createdUsers)
 
 	// Bulk update users
-	bulkUpdateUsers := []map[string]interface{}{
+	bulkUpdateUsers := []map[string]any{
 		{
 			"Id":             createdUsers[0],
 			"SingleLineText": "Jane Smith",
@@ -175,6 +176,8 @@ func main() {
 	}
 
 	fmt.Printf("Users with complex filter: %v\n", complexResult.List)
-	fmt.Printf("Page Info: Total Rows: %d, Page: %d, Page Size: %d, Is First Page: %t, Is Last Page: %t\n",
-		complexResult.PageInfo.TotalRows, complexResult.PageInfo.Page, complexResult.PageInfo.PageSize, complexResult.PageInfo.IsFirstPage, complexResult.PageInfo.IsLastPage)
+	fmt.Printf(
+		"Page Info: Total Rows: %d, Page: %d, Page Size: %d, Is First Page: %t, Is Last Page: %t\n",
+		complexResult.PageInfo.TotalRows, complexResult.PageInfo.Page, complexResult.PageInfo.PageSize, complexResult.PageInfo.IsFirstPage, complexResult.PageInfo.IsLastPage,
+	)
 }

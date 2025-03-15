@@ -6,33 +6,33 @@ import (
 	"time"
 )
 
-// ClientBuilder is used to build a new Client with a fluent API
-type ClientBuilder struct {
+// clientBuilder is used to build a new Client with a fluent API
+type clientBuilder struct {
 	baseURL    string
 	apiToken   string
 	httpClient *http.Client
 }
 
 // WithBaseURL sets the base URL for the client
-func (b *ClientBuilder) WithBaseURL(baseURL string) *ClientBuilder {
+func (b *clientBuilder) WithBaseURL(baseURL string) *clientBuilder {
 	b.baseURL = strings.TrimSuffix(baseURL, "/")
 	return b
 }
 
 // WithAPIToken sets the API token for the client
-func (b *ClientBuilder) WithAPIToken(apiToken string) *ClientBuilder {
+func (b *clientBuilder) WithAPIToken(apiToken string) *clientBuilder {
 	b.apiToken = apiToken
 	return b
 }
 
 // WithHTTPClient sets the HTTP client for the client
-func (b *ClientBuilder) WithHTTPClient(httpClient *http.Client) *ClientBuilder {
+func (b *clientBuilder) WithHTTPClient(httpClient *http.Client) *clientBuilder {
 	b.httpClient = httpClient
 	return b
 }
 
 // WithHTTPTimeout sets the timeout for the HTTP client
-func (b *ClientBuilder) WithHTTPTimeout(timeout time.Duration) *ClientBuilder {
+func (b *clientBuilder) WithHTTPTimeout(timeout time.Duration) *clientBuilder {
 	if b.httpClient == nil {
 		b.httpClient = &http.Client{}
 	}
@@ -41,7 +41,7 @@ func (b *ClientBuilder) WithHTTPTimeout(timeout time.Duration) *ClientBuilder {
 }
 
 // Build creates a new NocoDB client with the configured options
-func (b *ClientBuilder) Build() (*Client, error) {
+func (b *clientBuilder) Build() (*Client, error) {
 	if b.baseURL == "" {
 		return nil, ErrBaseURLRequired
 	}

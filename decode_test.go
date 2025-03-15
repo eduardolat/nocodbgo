@@ -70,7 +70,7 @@ func TestListResponseDecode(t *testing.T) {
 		},
 	}
 
-	response := &ListResponse{
+	response := ListResponse{
 		List: dataSlice,
 	}
 
@@ -127,7 +127,7 @@ func TestReadResponseDecode(t *testing.T) {
 		"Age":   30,
 	}
 
-	response := &ReadResponse{
+	response := ReadResponse{
 		Data: data,
 	}
 

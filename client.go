@@ -37,10 +37,24 @@ type Client struct {
 }
 
 // NewClient creates a new client builder
-func NewClient() *ClientBuilder {
-	return &ClientBuilder{
+func NewClient() *clientBuilder {
+	return &clientBuilder{
 		httpClient: &http.Client{Timeout: defaultTimeout},
 	}
+}
+
+// apiError represents an error returned by the NocoDB API
+type apiError struct {
+	Message string `json:"msg"`
+	Code    string `json:"code"`
+}
+
+// Error implements the error interface
+func (e apiError) Error() string {
+	if e.Code != "" {
+		return fmt.Sprintf("API error: %s (code: %s)", e.Message, e.Code)
+	}
+	return fmt.Sprintf("API error: %s", e.Message)
 }
 
 // request makes an HTTP request to the NocoDB API, it includes the api token in the request header
@@ -85,7 +99,7 @@ func (c *Client) request(ctx context.Context, method string, path string, body a
 	}
 
 	if resp.StatusCode >= 400 {
-		var apiErr APIError
+		var apiErr apiError
 		if err := json.Unmarshal(respBody, &apiErr); err != nil {
 			return nil, fmt.Errorf("status code %d: failed to unmarshal API error: %w", resp.StatusCode, err)
 		}
@@ -198,22 +212,6 @@ func (t *Table) BulkDelete(ctx context.Context, recordIDs []int) error {
 	_, err := t.client.request(ctx, http.MethodDelete, path, ids, nil)
 	if err != nil {
 		return fmt.Errorf("failed to bulk delete records: %w", err)
-	}
-
-	return nil
-}
-
-// decode is a helper function to decode data into a destination struct
-func decode(data any, dest any) error {
-	// Convert the data to JSON
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		return fmt.Errorf("failed to marshal data: %w", err)
-	}
-
-	// Unmarshal the JSON into the destination
-	if err := json.Unmarshal(jsonData, dest); err != nil {
-		return fmt.Errorf("failed to unmarshal data: %w", err)
 	}
 
 	return nil

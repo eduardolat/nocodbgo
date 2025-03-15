@@ -87,7 +87,7 @@ func TestClientBuilder(t *testing.T) {
 	}
 
 	// Create a builder with nil HTTP client
-	builder := &ClientBuilder{
+	builder := &clientBuilder{
 		baseURL:  "https://example.com",
 		apiToken: "test-token",
 	}

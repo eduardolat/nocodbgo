@@ -10,8 +10,8 @@ import (
 	"strings"
 )
 
-// ListBuilder is used to build a list query with a fluent API
-type ListBuilder struct {
+// listBuilder is used to build a list query with a fluent API
+type listBuilder struct {
 	table   *Table
 	ctx     context.Context
 	filters []string
@@ -23,85 +23,85 @@ type ListBuilder struct {
 }
 
 // List initiates the construction of a list query
-func (t *Table) List(ctx context.Context) *ListBuilder {
-	return &ListBuilder{
+func (t *Table) List(ctx context.Context) *listBuilder {
+	return &listBuilder{
 		table: t,
 		ctx:   ctx,
 	}
 }
 
 // EqualTo adds an equality filter to the query
-func (b *ListBuilder) EqualTo(column string, value any) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, Equal, value)
+func (b *listBuilder) EqualTo(column string, value any) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, equal, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // NotEqualTo adds an inequality filter to the query
-func (b *ListBuilder) NotEqualTo(column string, value any) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, NotEqual, value)
+func (b *listBuilder) NotEqualTo(column string, value any) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, notEqual, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // GreaterThan adds a greater than filter to the query
-func (b *ListBuilder) GreaterThan(column string, value any) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, GreaterThan, value)
+func (b *listBuilder) GreaterThan(column string, value any) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, greaterThan, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // GreaterThanOrEqual adds a greater than or equal filter to the query
-func (b *ListBuilder) GreaterThanOrEqual(column string, value any) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, GreaterThanOrEqual, value)
+func (b *listBuilder) GreaterThanOrEqual(column string, value any) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, greaterThanOrEqual, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // LessThan adds a less than filter to the query
-func (b *ListBuilder) LessThan(column string, value any) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, LessThan, value)
+func (b *listBuilder) LessThan(column string, value any) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, lessThan, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // LessThanOrEqual adds a less than or equal filter to the query
-func (b *ListBuilder) LessThanOrEqual(column string, value any) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, LessThanOrEqual, value)
+func (b *listBuilder) LessThanOrEqual(column string, value any) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, lessThanOrEqual, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // IsNull adds a is null filter to the query
-func (b *ListBuilder) IsNull(column string) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%s)", column, Is, "null")
+func (b *listBuilder) IsNull(column string) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%s)", column, is, "null")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // IsNotNull adds a is not null filter to the query
-func (b *ListBuilder) IsNotNull(column string) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%s)", column, IsNot, "null")
+func (b *listBuilder) IsNotNull(column string) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%s)", column, isNot, "null")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // IsTrue adds a is true filter to the query
-func (b *ListBuilder) IsTrue(column string) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%s)", column, Is, "true")
+func (b *listBuilder) IsTrue(column string) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%s)", column, is, "true")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // IsFalse adds a is false filter to the query
-func (b *ListBuilder) IsFalse(column string) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%s)", column, Is, "false")
+func (b *listBuilder) IsFalse(column string) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%s)", column, is, "false")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // In adds an in filter to the query
-func (b *ListBuilder) In(column string, values ...any) *ListBuilder {
+func (b *listBuilder) In(column string, values ...any) *listBuilder {
 	if len(values) == 0 {
 		return b
 	}
@@ -111,65 +111,65 @@ func (b *ListBuilder) In(column string, values ...any) *ListBuilder {
 		valuesStr = append(valuesStr, fmt.Sprintf("%v", v))
 	}
 
-	filter := fmt.Sprintf("(%s,%s,%s)", column, In, strings.Join(valuesStr, ","))
+	filter := fmt.Sprintf("(%s,%s,%s)", column, in, strings.Join(valuesStr, ","))
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // Between adds a between filter to the query
-func (b *ListBuilder) Between(column string, min, max any) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v,%v)", column, Between, min, max)
+func (b *listBuilder) Between(column string, min, max any) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v,%v)", column, between, min, max)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // NotBetween adds a not between filter to the query
-func (b *ListBuilder) NotBetween(column string, min, max any) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v,%v)", column, NotBetween, min, max)
+func (b *listBuilder) NotBetween(column string, min, max any) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v,%v)", column, notBetween, min, max)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // Like adds a like filter to the query
-func (b *ListBuilder) Like(column string, value any) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, Like, value)
+func (b *listBuilder) Like(column string, value any) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, like, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // NotLike adds a not like filter to the query
-func (b *ListBuilder) NotLike(column string, value any) *ListBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, NotLike, value)
+func (b *listBuilder) NotLike(column string, value any) *listBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, notLike, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // SortAsc adds an ascending sort to the query
-func (b *ListBuilder) SortAsc(column string) *ListBuilder {
+func (b *listBuilder) SortAsc(column string) *listBuilder {
 	b.sorts = append(b.sorts, column)
 	return b
 }
 
 // SortDesc adds a descending sort to the query
-func (b *ListBuilder) SortDesc(column string) *ListBuilder {
+func (b *listBuilder) SortDesc(column string) *listBuilder {
 	b.sorts = append(b.sorts, "-"+column)
 	return b
 }
 
 // Limit adds a limit to the query
-func (b *ListBuilder) Limit(limit int) *ListBuilder {
+func (b *listBuilder) Limit(limit int) *listBuilder {
 	b.limit = limit
 	return b
 }
 
 // Offset adds an offset to the query
-func (b *ListBuilder) Offset(offset int) *ListBuilder {
+func (b *listBuilder) Offset(offset int) *listBuilder {
 	b.offset = offset
 	return b
 }
 
 // Page adds pagination to the query
-func (b *ListBuilder) Page(page, pageSize int) *ListBuilder {
+func (b *listBuilder) Page(page, pageSize int) *listBuilder {
 	if page < 1 {
 		page = 1
 	}
@@ -182,19 +182,47 @@ func (b *ListBuilder) Page(page, pageSize int) *ListBuilder {
 }
 
 // Fields adds specific fields to the query
-func (b *ListBuilder) Fields(fields ...string) *ListBuilder {
+func (b *listBuilder) Fields(fields ...string) *listBuilder {
 	b.fields = fields
 	return b
 }
 
 // Shuffle adds a shuffle parameter to the query
-func (b *ListBuilder) Shuffle(shuffle bool) *ListBuilder {
+func (b *listBuilder) Shuffle(shuffle bool) *listBuilder {
 	b.shuffle = shuffle
 	return b
 }
 
+// ListResponse is the response from a list query with pagination information
+type ListResponse struct {
+	// List contains the records returned by the query
+	List []map[string]any `json:"list"`
+	// PageInfo contains pagination information
+	PageInfo PageInfo `json:"pageInfo"`
+}
+
+// PageInfo contains pagination information for list queries
+type PageInfo struct {
+	// TotalRows is the total number of rows in the table
+	TotalRows int `json:"totalRows"`
+	// Page is the current page number
+	Page int `json:"page"`
+	// PageSize is the number of records per page
+	PageSize int `json:"pageSize"`
+	// IsFirstPage indicates if this is the first page
+	IsFirstPage bool `json:"isFirstPage"`
+	// IsLastPage indicates if this is the last page
+	IsLastPage bool `json:"isLastPage"`
+}
+
+// Decode converts the list response into a slice of structs
+// It takes a pointer to a slice of structs as destination and populates it with the data
+func (r ListResponse) Decode(dest any) error {
+	return decode(r.List, dest)
+}
+
 // Execute executes the list query
-func (b *ListBuilder) Execute() (*ListResponse, error) {
+func (b *listBuilder) Execute() (ListResponse, error) {
 	query := url.Values{}
 
 	// Add filters
@@ -230,127 +258,104 @@ func (b *ListBuilder) Execute() (*ListResponse, error) {
 	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)
 	respBody, err := b.table.client.request(b.ctx, http.MethodGet, path, nil, query)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list records: %w", err)
+		return ListResponse{}, fmt.Errorf("failed to list records: %w", err)
 	}
 
-	var response listResponse
+	var response ListResponse
 	if err := json.Unmarshal(respBody, &response); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal list response: %w", err)
+		return ListResponse{}, fmt.Errorf("failed to unmarshal list response: %w", err)
 	}
 
-	return &ListResponse{
-		List:     response.List,
-		PageInfo: PageInfo(response.PageInfo),
-	}, nil
+	return response, nil
 }
 
-// ListResponse is the response from a list query
-type ListResponse struct {
-	List     []map[string]any
-	PageInfo PageInfo
-}
-
-// PageInfo contains pagination information
-type PageInfo struct {
-	TotalRows   int
-	Page        int
-	PageSize    int
-	IsFirstPage bool
-	IsLastPage  bool
-}
-
-// Decode decodes the list response into a slice of structs
-func (r *ListResponse) Decode(dest any) error {
-	return decode(r.List, dest)
-}
-
-// CountBuilder is used to build a count query with a fluent API
-type CountBuilder struct {
+// countBuilder is used to build a count query with a fluent API
+type countBuilder struct {
 	table   *Table
 	ctx     context.Context
 	filters []string
 }
 
 // Count initiates the construction of a count query
-func (t *Table) Count(ctx context.Context) *CountBuilder {
-	return &CountBuilder{
+func (t *Table) Count(ctx context.Context) *countBuilder {
+	return &countBuilder{
 		table: t,
 		ctx:   ctx,
 	}
 }
 
 // EqualTo adds an equality filter to the query
-func (b *CountBuilder) EqualTo(column string, value any) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, Equal, value)
+func (b *countBuilder) EqualTo(column string, value any) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, equal, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // NotEqualTo adds an inequality filter to the query
-func (b *CountBuilder) NotEqualTo(column string, value any) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, NotEqual, value)
+func (b *countBuilder) NotEqualTo(column string, value any) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, notEqual, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // GreaterThan adds a greater than filter to the query
-func (b *CountBuilder) GreaterThan(column string, value any) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, GreaterThan, value)
+func (b *countBuilder) GreaterThan(column string, value any) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, greaterThan, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // GreaterThanOrEqual adds a greater than or equal filter to the query
-func (b *CountBuilder) GreaterThanOrEqual(column string, value any) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, GreaterThanOrEqual, value)
+func (b *countBuilder) GreaterThanOrEqual(column string, value any) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, greaterThanOrEqual, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // LessThan adds a less than filter to the query
-func (b *CountBuilder) LessThan(column string, value any) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, LessThan, value)
+func (b *countBuilder) LessThan(column string, value any) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, lessThan, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // LessThanOrEqual adds a less than or equal filter to the query
-func (b *CountBuilder) LessThanOrEqual(column string, value any) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, LessThanOrEqual, value)
+func (b *countBuilder) LessThanOrEqual(column string, value any) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, lessThanOrEqual, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // IsNull adds a is null filter to the query
-func (b *CountBuilder) IsNull(column string) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%s)", column, Is, "null")
+func (b *countBuilder) IsNull(column string) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%s)", column, is, "null")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // IsNotNull adds a is not null filter to the query
-func (b *CountBuilder) IsNotNull(column string) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%s)", column, IsNot, "null")
+func (b *countBuilder) IsNotNull(column string) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%s)", column, isNot, "null")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // IsTrue adds a is true filter to the query
-func (b *CountBuilder) IsTrue(column string) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%s)", column, Is, "true")
+func (b *countBuilder) IsTrue(column string) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%s)", column, is, "true")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // IsFalse adds a is false filter to the query
-func (b *CountBuilder) IsFalse(column string) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%s)", column, Is, "false")
+func (b *countBuilder) IsFalse(column string) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%s)", column, is, "false")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // In adds an in filter to the query
-func (b *CountBuilder) In(column string, values ...any) *CountBuilder {
+func (b *countBuilder) In(column string, values ...any) *countBuilder {
 	if len(values) == 0 {
 		return b
 	}
@@ -360,41 +365,41 @@ func (b *CountBuilder) In(column string, values ...any) *CountBuilder {
 		valuesStr = append(valuesStr, fmt.Sprintf("%v", v))
 	}
 
-	filter := fmt.Sprintf("(%s,%s,%s)", column, In, strings.Join(valuesStr, ","))
+	filter := fmt.Sprintf("(%s,%s,%s)", column, in, strings.Join(valuesStr, ","))
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // Between adds a between filter to the query
-func (b *CountBuilder) Between(column string, min, max any) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v,%v)", column, Between, min, max)
+func (b *countBuilder) Between(column string, min, max any) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v,%v)", column, between, min, max)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // NotBetween adds a not between filter to the query
-func (b *CountBuilder) NotBetween(column string, min, max any) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v,%v)", column, NotBetween, min, max)
+func (b *countBuilder) NotBetween(column string, min, max any) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v,%v)", column, notBetween, min, max)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // Like adds a like filter to the query
-func (b *CountBuilder) Like(column string, value any) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, Like, value)
+func (b *countBuilder) Like(column string, value any) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, like, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // NotLike adds a not like filter to the query
-func (b *CountBuilder) NotLike(column string, value any) *CountBuilder {
-	filter := fmt.Sprintf("(%s,%s,%v)", column, NotLike, value)
+func (b *countBuilder) NotLike(column string, value any) *countBuilder {
+	filter := fmt.Sprintf("(%s,%s,%v)", column, notLike, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
 // Execute executes the count query
-func (b *CountBuilder) Execute() (int, error) {
+func (b *countBuilder) Execute() (int, error) {
 	query := url.Values{}
 
 	// Add filters
@@ -408,7 +413,9 @@ func (b *CountBuilder) Execute() (int, error) {
 		return 0, fmt.Errorf("failed to count records: %w", err)
 	}
 
-	var response countResponse
+	var response struct {
+		Count int `json:"count"`
+	}
 	if err := json.Unmarshal(respBody, &response); err != nil {
 		return 0, fmt.Errorf("failed to unmarshal count response: %w", err)
 	}
@@ -416,8 +423,8 @@ func (b *CountBuilder) Execute() (int, error) {
 	return response.Count, nil
 }
 
-// ReadBuilder is used to build a read query with a fluent API
-type ReadBuilder struct {
+// readBuilder is used to build a read query with a fluent API
+type readBuilder struct {
 	table    *Table
 	ctx      context.Context
 	recordID int
@@ -425,8 +432,8 @@ type ReadBuilder struct {
 }
 
 // Read initiates the construction of a read query
-func (t *Table) Read(ctx context.Context, recordID int) *ReadBuilder {
-	return &ReadBuilder{
+func (t *Table) Read(ctx context.Context, recordID int) *readBuilder {
+	return &readBuilder{
 		table:    t,
 		ctx:      ctx,
 		recordID: recordID,
@@ -434,15 +441,27 @@ func (t *Table) Read(ctx context.Context, recordID int) *ReadBuilder {
 }
 
 // Fields adds specific fields to the query
-func (b *ReadBuilder) Fields(fields ...string) *ReadBuilder {
+func (b *readBuilder) Fields(fields ...string) *readBuilder {
 	b.fields = fields
 	return b
 }
 
+// ReadResponse is the response from a read query
+type ReadResponse struct {
+	// Data contains the record data
+	Data map[string]any
+}
+
+// Decode converts the read response into a struct
+// It takes a pointer to a struct as destination and populates it with the data
+func (r ReadResponse) Decode(dest any) error {
+	return decode(r.Data, dest)
+}
+
 // Execute executes the read query
-func (b *ReadBuilder) Execute() (*ReadResponse, error) {
+func (b *readBuilder) Execute() (ReadResponse, error) {
 	if b.recordID == 0 {
-		return nil, ErrRowIDRequired
+		return ReadResponse{}, ErrRowIDRequired
 	}
 
 	query := url.Values{}
@@ -455,25 +474,13 @@ func (b *ReadBuilder) Execute() (*ReadResponse, error) {
 	path := fmt.Sprintf("/api/v2/tables/%s/records/%d", b.table.tableID, b.recordID)
 	respBody, err := b.table.client.request(b.ctx, http.MethodGet, path, nil, query)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read record: %w", err)
+		return ReadResponse{}, fmt.Errorf("failed to read record: %w", err)
 	}
 
 	var response map[string]any
 	if err := json.Unmarshal(respBody, &response); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal read response: %w", err)
+		return ReadResponse{}, fmt.Errorf("failed to unmarshal read response: %w", err)
 	}
 
-	return &ReadResponse{
-		Data: response,
-	}, nil
-}
-
-// ReadResponse is the response from a read query
-type ReadResponse struct {
-	Data map[string]any
-}
-
-// Decode decodes the read response into a struct
-func (r *ReadResponse) Decode(dest any) error {
-	return decode(r.Data, dest)
+	return ReadResponse{Data: response}, nil
 }

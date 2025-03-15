@@ -23,6 +23,11 @@ A Zero-Dependency Go client for the
 This client provides a simple and intuitive way to interact with the NocoDB API
 using a fluent chain pattern.
 
+> [!WARNING]
+> This client is not yet stable and the API signature may change in the future
+> until it reaches version 1.0.0 so be careful when upgrading. Howeever, the API
+> signature should not change too much.
+
 ## Installation
 
 ```bash

@@ -150,7 +150,12 @@ func (t *Table) Update(ctx context.Context, recordID int, data map[string]any) e
 	}
 	updateData["Id"] = recordID
 
-	return t.BulkUpdate(ctx, []map[string]any{updateData})
+	err := t.BulkUpdate(ctx, []map[string]any{updateData})
+	if err != nil {
+		return fmt.Errorf("failed to update record: %w", err)
+	}
+
+	return nil
 }
 
 // Delete deletes a record from a table
@@ -159,7 +164,12 @@ func (t *Table) Delete(ctx context.Context, recordID int) error {
 		return ErrRowIDRequired
 	}
 
-	return t.BulkDelete(ctx, []int{recordID})
+	err := t.BulkDelete(ctx, []int{recordID})
+	if err != nil {
+		return fmt.Errorf("failed to delete record: %w", err)
+	}
+
+	return nil
 }
 
 // BulkCreate creates multiple records in a table and returns the IDs
@@ -167,12 +177,12 @@ func (t *Table) BulkCreate(ctx context.Context, data []map[string]any) ([]int, e
 	path := fmt.Sprintf("/api/v2/tables/%s/records", t.tableID)
 	respBody, err := t.client.request(ctx, http.MethodPost, path, data, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to bulk create records: %w", err)
+		return nil, fmt.Errorf("failed to create records: %w", err)
 	}
 
 	var response []map[string]any
 	if err := json.Unmarshal(respBody, &response); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal bulk create response: %w", err)
+		return nil, fmt.Errorf("failed to unmarshal create response: %w", err)
 	}
 
 	var ids []int
@@ -190,7 +200,7 @@ func (t *Table) BulkUpdate(ctx context.Context, data []map[string]any) error {
 	path := fmt.Sprintf("/api/v2/tables/%s/records", t.tableID)
 	_, err := t.client.request(ctx, http.MethodPatch, path, data, nil)
 	if err != nil {
-		return fmt.Errorf("failed to bulk update records: %w", err)
+		return fmt.Errorf("failed to update records: %w", err)
 	}
 
 	return nil
@@ -211,7 +221,7 @@ func (t *Table) BulkDelete(ctx context.Context, recordIDs []int) error {
 	path := fmt.Sprintf("/api/v2/tables/%s/records", t.tableID)
 	_, err := t.client.request(ctx, http.MethodDelete, path, ids, nil)
 	if err != nil {
-		return fmt.Errorf("failed to bulk delete records: %w", err)
+		return fmt.Errorf("failed to delete records: %w", err)
 	}
 
 	return nil

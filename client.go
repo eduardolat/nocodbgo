@@ -55,13 +55,13 @@ type apiError struct {
 func (e apiError) Error() string {
 	if e.Code != "" {
 		if e.Msg != "" {
-			return fmt.Sprintf("%s: %s)", e.Code, e.Msg)
+			return fmt.Sprintf("%s: %s", e.Code, e.Msg)
 		}
 		if e.Message != "" {
-			return fmt.Sprintf("%s: %s)", e.Code, e.Message)
+			return fmt.Sprintf("%s: %s", e.Code, e.Message)
 		}
 		if e.ErrMsg != "" {
-			return fmt.Sprintf("%s: %s)", e.Code, e.ErrMsg)
+			return fmt.Sprintf("%s: %s", e.Code, e.ErrMsg)
 		}
 	}
 

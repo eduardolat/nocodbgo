@@ -136,7 +136,9 @@ func (c *Client) request(ctx context.Context, method string, path string, body a
 	return respBody, nil
 }
 
-// Table returns a new table with the given ID
+// Table returns a new table instance with the given ID, this instance
+// is used to interact with the table and perform CRUD operations on
+// it's records.
 func (c *Client) Table(tableID string) *Table {
 	return &Table{
 		client:  c,

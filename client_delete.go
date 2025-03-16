@@ -13,7 +13,9 @@ type deleteBuilder struct {
 	recordID int
 }
 
-// DeleteRecord initiates the construction of a delete query
+// DeleteRecord initiates the construction of a delete operation for a single record.
+// It accepts a record ID to identify which record to delete.
+// Returns a deleteBuilder for further configuration and execution.
 func (t *Table) DeleteRecord(recordID int) *deleteBuilder {
 	return &deleteBuilder{
 		table:    t,
@@ -22,13 +24,16 @@ func (t *Table) DeleteRecord(recordID int) *deleteBuilder {
 	}
 }
 
-// WithContext sets the context for the query
+// WithContext sets the context for the delete operation.
+// This allows for request cancellation and timeout control.
+// Returns the deleteBuilder for method chaining.
 func (b *deleteBuilder) WithContext(ctx context.Context) *deleteBuilder {
 	b.ctx = ctx
 	return b
 }
 
-// Execute executes the delete query
+// Execute performs the delete operation with the configured parameters.
+// Returns an error if the operation fails.
 func (b *deleteBuilder) Execute() error {
 	if b.recordID == 0 {
 		return ErrRowIDRequired
@@ -52,7 +57,9 @@ type bulkDeleteBuilder struct {
 	recordIDs []int
 }
 
-// BulkDeleteRecords initiates the construction of a bulk delete query
+// BulkDeleteRecords initiates the construction of a bulk delete operation for multiple records.
+// It accepts a slice of record IDs to identify which records to delete.
+// Returns a bulkDeleteBuilder for further configuration and execution.
 func (t *Table) BulkDeleteRecords(recordIDs []int) *bulkDeleteBuilder {
 	return &bulkDeleteBuilder{
 		table:     t,
@@ -61,13 +68,17 @@ func (t *Table) BulkDeleteRecords(recordIDs []int) *bulkDeleteBuilder {
 	}
 }
 
-// WithContext sets the context for the query
+// WithContext sets the context for the bulk delete operation.
+// This allows for request cancellation and timeout control.
+// Returns the bulkDeleteBuilder for method chaining.
 func (b *bulkDeleteBuilder) WithContext(ctx context.Context) *bulkDeleteBuilder {
 	b.ctx = ctx
 	return b
 }
 
-// Execute executes the bulk delete query
+// Execute performs the bulk delete operation with the configured parameters.
+// If no record IDs are provided, the method returns without an error.
+// Returns an error if the operation fails.
 func (b *bulkDeleteBuilder) Execute() error {
 	if len(b.recordIDs) == 0 {
 		return nil

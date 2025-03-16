@@ -15,9 +15,9 @@ type updateBuilder struct {
 	chainErr error // Stores any error in the chain of methods
 }
 
-// UpdateRecord initiates the construction of an update query
-//
-// The data parameter can be either a map[string]any or a struct with JSON tags
+// UpdateRecord initiates the construction of an update query for a single record.
+// It accepts a record ID and the data to update, which can be either a map[string]any or a struct with JSON tags.
+// Returns an updateBuilder for further configuration and execution.
 func (t *Table) UpdateRecord(recordID int, data any) *updateBuilder {
 	var dataMap map[string]any
 	var err error
@@ -38,13 +38,16 @@ func (t *Table) UpdateRecord(recordID int, data any) *updateBuilder {
 	}
 }
 
-// WithContext sets the context for the query
+// WithContext sets the context for the update operation.
+// This allows for request cancellation and timeout control.
+// Returns the updateBuilder for method chaining.
 func (b *updateBuilder) WithContext(ctx context.Context) *updateBuilder {
 	b.ctx = ctx
 	return b
 }
 
-// Execute executes the update query
+// Execute performs the update operation with the configured parameters.
+// Returns an error if the operation fails.
 func (b *updateBuilder) Execute() error {
 	if b.recordID == 0 {
 		return ErrRowIDRequired
@@ -80,11 +83,10 @@ type bulkUpdateBuilder struct {
 	chainErr error // Stores any error in the chain of methods
 }
 
-// BulkUpdateRecords initiates the construction of a bulk update query
-//
-// The data parameter can be either a []map[string]any or a slice of structs with JSON tags
-//
-// Each record must have an "Id" field
+// BulkUpdateRecords initiates the construction of a bulk update query for multiple records.
+// It accepts data which can be either a []map[string]any or a slice of structs with JSON tags.
+// Each record must have an "Id" field to identify which record to update.
+// Returns a bulkUpdateBuilder for further configuration and execution.
 func (t *Table) BulkUpdateRecords(data any) *bulkUpdateBuilder {
 	var dataMaps []map[string]any
 	var err error
@@ -104,13 +106,16 @@ func (t *Table) BulkUpdateRecords(data any) *bulkUpdateBuilder {
 	}
 }
 
-// WithContext sets the context for the query
+// WithContext sets the context for the bulk update operation.
+// This allows for request cancellation and timeout control.
+// Returns the bulkUpdateBuilder for method chaining.
 func (b *bulkUpdateBuilder) WithContext(ctx context.Context) *bulkUpdateBuilder {
 	b.ctx = ctx
 	return b
 }
 
-// Execute executes the bulk update query
+// Execute performs the bulk update operation with the configured parameters.
+// Returns an error if the operation fails.
 func (b *bulkUpdateBuilder) Execute() error {
 	if b.chainErr != nil {
 		return fmt.Errorf("error in the chain of methods: %w", b.chainErr)

@@ -24,7 +24,7 @@ const (
 	defaultTimeout = 30 * time.Second
 )
 
-// Client is the NocoDB API client
+// Client provides access to the NocoDB API
 type Client struct {
 	// baseURL is the base URL for the NocoDB API
 	baseURL string
@@ -36,7 +36,7 @@ type Client struct {
 	httpClient *http.Client
 }
 
-// NewClient creates a new client builder
+// NewClient creates a new client builder for configuring and creating a NocoDB client
 func NewClient() *clientBuilder {
 	return &clientBuilder{
 		httpClient: &http.Client{Timeout: defaultTimeout},
@@ -51,7 +51,7 @@ type apiError struct {
 	Code    string `json:"code"`
 }
 
-// Error implements the error interface
+// Error implements the error interface for apiError
 func (e apiError) Error() string {
 	if e.Code != "" {
 		if e.Msg != "" {
@@ -78,7 +78,9 @@ func (e apiError) Error() string {
 	return "Unknown error"
 }
 
-// request makes an HTTP request to the NocoDB API, it includes the api token in the request header
+// request makes an HTTP request to the NocoDB API with the provided method, path, body, and query parameters.
+// It automatically includes the API token in the request header.
+// Returns the response body as a byte slice or an error if the request fails.
 func (c *Client) request(ctx context.Context, method string, path string, body any, query url.Values) ([]byte, error) {
 	parsedUrl, err := url.Parse(fmt.Sprintf("%s/%s", c.baseURL, strings.TrimPrefix(path, "/")))
 	if err != nil {
@@ -136,10 +138,8 @@ func (c *Client) request(ctx context.Context, method string, path string, body a
 	return respBody, nil
 }
 
-// Table returns a new table instance with the given ID, this instance
-// is used to interact with the table and perform CRUD operations on
-// it's records using methods like CreateRecord, ReadRecord, UpdateRecord,
-// DeleteRecord, etc.
+// Table returns a new Table instance for the specified table ID.
+// This instance provides methods for performing CRUD operations on the table's records.
 func (c *Client) Table(tableID string) *Table {
 	return &Table{
 		client:  c,
@@ -147,7 +147,7 @@ func (c *Client) Table(tableID string) *Table {
 	}
 }
 
-// Table represents a table in NocoDB
+// Table represents a table in NocoDB and provides methods for interacting with its records
 type Table struct {
 	client  *Client
 	tableID string

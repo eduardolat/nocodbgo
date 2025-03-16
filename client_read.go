@@ -17,7 +17,9 @@ type readBuilder struct {
 	fields   []string
 }
 
-// ReadRecord initiates the construction of a read query
+// ReadRecord initiates the construction of a read query for a single record.
+// It accepts a record ID to identify which record to retrieve.
+// Returns a readBuilder for further configuration and execution.
 func (t *Table) ReadRecord(recordID int) *readBuilder {
 	return &readBuilder{
 		table:    t,
@@ -26,13 +28,17 @@ func (t *Table) ReadRecord(recordID int) *readBuilder {
 	}
 }
 
-// WithContext sets the context for the query
+// WithContext sets the context for the read operation.
+// This allows for request cancellation and timeout control.
+// Returns the readBuilder for method chaining.
 func (b *readBuilder) WithContext(ctx context.Context) *readBuilder {
 	b.ctx = ctx
 	return b
 }
 
-// ReturnFields adds specific fields to the query
+// ReturnFields specifies which fields to include in the response.
+// If not called, all fields will be returned.
+// Returns the readBuilder for method chaining.
 func (b *readBuilder) ReturnFields(fields ...string) *readBuilder {
 	b.fields = fields
 	return b
@@ -44,13 +50,15 @@ type ReadResponse struct {
 	Data map[string]any
 }
 
-// DecodeInto converts the read response into a struct
-// It takes a pointer to a struct as destination and populates it with the data
+// DecodeInto converts the read response data into the provided struct.
+// It takes a pointer to a struct as destination and populates it with the data.
+// Returns an error if the conversion fails.
 func (r ReadResponse) DecodeInto(dest any) error {
 	return decodeInto(r.Data, dest)
 }
 
-// Execute executes the read query
+// Execute performs the read operation with the configured parameters.
+// Returns a ReadResponse containing the record data or an error if the operation fails.
 func (b *readBuilder) Execute() (ReadResponse, error) {
 	if b.recordID == 0 {
 		return ReadResponse{}, ErrRowIDRequired

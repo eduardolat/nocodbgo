@@ -5,7 +5,9 @@ import (
 	"fmt"
 )
 
-// decodeInto converts a map or slice of maps into a struct or slice of structs
+// decodeInto converts data from a map or slice of maps into the provided destination struct or slice of structs.
+// It uses JSON marshaling and unmarshaling internally to perform the conversion.
+// Returns an error if marshaling or unmarshaling fails.
 func decodeInto(data any, dest any) error {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
@@ -19,7 +21,9 @@ func decodeInto(data any, dest any) error {
 	return nil
 }
 
-// structToMap converts a struct into a map[string]any using JSON tags
+// structToMap converts a struct into a map[string]any using the struct's JSON tags.
+// This is useful when you need to convert a strongly typed struct into a map for API operations.
+// Returns the resulting map and any error encountered during conversion.
 func structToMap(data any) (map[string]any, error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
@@ -34,7 +38,9 @@ func structToMap(data any) (map[string]any, error) {
 	return result, nil
 }
 
-// structsToMaps converts a slice of structs into a slice of maps using JSON tags
+// structsToMaps converts a slice of structs into a slice of maps using JSON tags.
+// This is useful when you need to convert a slice of strongly typed structs into a slice of maps for API operations.
+// Returns the resulting slice of maps and any error encountered during conversion.
 func structsToMaps(data any) ([]map[string]any, error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {

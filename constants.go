@@ -1,43 +1,43 @@
 package nocodbgo
 
-// comparisonOperator represents a comparison operator
+// comparisonOperator represents a comparison operator used in query filters
 type comparisonOperator string
 
 const (
-	// equal operator for equality
+	// equal represents the equality operator (=)
 	equal comparisonOperator = "eq"
-	// notEqual operator for inequality
+	// notEqual represents the inequality operator (!=)
 	notEqual comparisonOperator = "neq"
-	// greaterThan operator for greater than
+	// greaterThan represents the greater than operator (>)
 	greaterThan comparisonOperator = "gt"
-	// greaterThanOrEqual operator for greater than or equal
+	// greaterThanOrEqual represents the greater than or equal operator (>=)
 	greaterThanOrEqual comparisonOperator = "ge"
-	// lessThan operator for less than
+	// lessThan represents the less than operator (<)
 	lessThan comparisonOperator = "lt"
-	// lessThanOrEqual operator for less than or equal
+	// lessThanOrEqual represents the less than or equal operator (<=)
 	lessThanOrEqual comparisonOperator = "le"
-	// is operator for is
+	// is represents the IS operator for checking specific states
 	is comparisonOperator = "is"
-	// isNot operator for is not
+	// isNot represents the IS NOT operator for excluding specific states
 	isNot comparisonOperator = "isnot"
-	// in operator for in
+	// in represents the IN operator for checking if a value is in a set
 	in comparisonOperator = "in"
-	// between operator for between
+	// between represents the BETWEEN operator for range checks
 	between comparisonOperator = "btw"
-	// notBetween operator for not between
+	// notBetween represents the NOT BETWEEN operator for excluding ranges
 	notBetween comparisonOperator = "nbtw"
-	// like operator for like
+	// like represents the LIKE operator for pattern matching
 	like comparisonOperator = "like"
-	// notLike operator for not like
+	// notLike represents the NOT LIKE operator for excluding patterns
 	notLike comparisonOperator = "nlike"
-	// isWithin operator for is within
+	// isWithin represents the IS WITHIN operator for temporal queries
 	isWithin comparisonOperator = "isWithin"
-	// allOf operator for all of
+	// allOf represents the ALL OF operator for checking if all values in a set match
 	allOf comparisonOperator = "allof"
-	// anyOf operator for any of
+	// anyOf represents the ANY OF operator for checking if any value in a set matches
 	anyOf comparisonOperator = "anyof"
-	// notAllOf operator for not all of
+	// notAllOf represents the NOT ALL OF operator for checking if not all values in a set match
 	notAllOf comparisonOperator = "nallof"
-	// notAnyOf operator for not any of
+	// notAnyOf represents the NOT ANY OF operator for checking if none of the values in a set match
 	notAnyOf comparisonOperator = "nanyof"
 )

@@ -22,7 +22,8 @@ type listBuilder struct {
 	shuffle bool
 }
 
-// ListRecords initiates the construction of a list query
+// ListRecords initiates the construction of a query to list records from a table.
+// Returns a listBuilder for further configuration and execution.
 func (t *Table) ListRecords() *listBuilder {
 	return &listBuilder{
 		table: t,
@@ -30,83 +31,96 @@ func (t *Table) ListRecords() *listBuilder {
 	}
 }
 
-// WithContext sets the context for the query
+// WithContext sets the context for the list operation.
+// This allows for request cancellation and timeout control.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) WithContext(ctx context.Context) *listBuilder {
 	b.ctx = ctx
 	return b
 }
 
-// FilterEqualTo adds an equality filter to the query
+// FilterEqualTo adds a filter to match records where the specified column equals the given value.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterEqualTo(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, equal, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterNotEqualTo adds an inequality filter to the query
+// FilterNotEqualTo adds a filter to match records where the specified column does not equal the given value.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterNotEqualTo(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, notEqual, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterGreaterThan adds a greater than filter to the query
+// FilterGreaterThan adds a filter to match records where the specified column is greater than the given value.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterGreaterThan(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, greaterThan, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterGreaterThanOrEqual adds a greater than or equal filter to the query
+// FilterGreaterThanOrEqual adds a filter to match records where the specified column is greater than or equal to the given value.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterGreaterThanOrEqual(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, greaterThanOrEqual, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterLessThan adds a less than filter to the query
+// FilterLessThan adds a filter to match records where the specified column is less than the given value.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterLessThan(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, lessThan, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterLessThanOrEqual adds a less than or equal filter to the query
+// FilterLessThanOrEqual adds a filter to match records where the specified column is less than or equal to the given value.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterLessThanOrEqual(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, lessThanOrEqual, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterIsNull adds a is null filter to the query
+// FilterIsNull adds a filter to match records where the specified column is null.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterIsNull(column string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, is, "null")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterIsNotNull adds a is not null filter to the query
+// FilterIsNotNull adds a filter to match records where the specified column is not null.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterIsNotNull(column string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, isNot, "null")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterIsTrue adds a is true filter to the query
+// FilterIsTrue adds a filter to match records where the specified column is true.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterIsTrue(column string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, is, "true")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterIsFalse adds a is false filter to the query
+// FilterIsFalse adds a filter to match records where the specified column is false.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterIsFalse(column string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, is, "false")
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterIn adds an in filter to the query
+// FilterIn adds a filter to match records where the specified column's value is in the provided list of values.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterIn(column string, values ...string) *listBuilder {
 	if len(values) == 0 {
 		return b
@@ -117,42 +131,51 @@ func (b *listBuilder) FilterIn(column string, values ...string) *listBuilder {
 	return b
 }
 
-// FilterBetween adds a between filter to the query
+// FilterBetween adds a filter to match records where the specified column's value is between the min and max values (inclusive).
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterBetween(column string, min, max string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s,%s)", column, between, min, max)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterNotBetween adds a not between filter to the query
+// FilterNotBetween adds a filter to match records where the specified column's value is not between the min and max values.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterNotBetween(column string, min, max string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s,%s)", column, notBetween, min, max)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterLike adds a like filter to the query
+// FilterLike adds a filter to match records where the specified column's value matches the given pattern.
+// The pattern can include wildcards (% for any sequence of characters, _ for a single character).
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterLike(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, like, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterNotLike adds a not like filter to the query
+// FilterNotLike adds a filter to match records where the specified column's value does not match the given pattern.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterNotLike(column string, value string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, notLike, value)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterIsWithin adds an isWithin filter to the query (Available in Date and DateTime only)
+// FilterIsWithin adds a filter for date/datetime columns to match records within a specific time range.
+// The subOperation parameter specifies the time range (e.g., "today", "yesterday", "thisWeek").
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterIsWithin(column string, subOperation string) *listBuilder {
 	filter := fmt.Sprintf("(%s,%s,%s)", column, isWithin, subOperation)
 	b.filters = append(b.filters, filter)
 	return b
 }
 
-// FilterAllOf adds an allOf filter to the query (includes all of the values)
+// FilterAllOf adds a filter to match records where the specified column contains all of the provided values.
+// Typically used with multi-select or array columns.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterAllOf(column string, values ...string) *listBuilder {
 	if len(values) == 0 {
 		return b
@@ -163,7 +186,9 @@ func (b *listBuilder) FilterAllOf(column string, values ...string) *listBuilder 
 	return b
 }
 
-// FilterAnyOf adds an anyOf filter to the query (includes any of the values)
+// FilterAnyOf adds a filter to match records where the specified column contains any of the provided values.
+// Typically used with multi-select or array columns.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterAnyOf(column string, values ...string) *listBuilder {
 	if len(values) == 0 {
 		return b
@@ -174,7 +199,9 @@ func (b *listBuilder) FilterAnyOf(column string, values ...string) *listBuilder 
 	return b
 }
 
-// FilterNotAllOf adds a notAllOf filter to the query (does not include all of the values)
+// FilterNotAllOf adds a filter to match records where the specified column does not contain all of the provided values.
+// Typically used with multi-select or array columns.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterNotAllOf(column string, values ...string) *listBuilder {
 	if len(values) == 0 {
 		return b
@@ -185,7 +212,9 @@ func (b *listBuilder) FilterNotAllOf(column string, values ...string) *listBuild
 	return b
 }
 
-// FilterNotAnyOf adds a notAnyOf filter to the query (does not include any of the values)
+// FilterNotAnyOf adds a filter to match records where the specified column does not contain any of the provided values.
+// Typically used with multi-select or array columns.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterNotAnyOf(column string, values ...string) *listBuilder {
 	if len(values) == 0 {
 		return b
@@ -196,7 +225,9 @@ func (b *listBuilder) FilterNotAnyOf(column string, values ...string) *listBuild
 	return b
 }
 
-// FilterWhere adds a custom filter expression to the query
+// FilterWhere adds a custom filter expression to the query.
+// This allows for more complex filtering logic than the predefined filter methods.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) FilterWhere(filter string) *listBuilder {
 	if filter != "" {
 		b.filters = append(b.filters, filter)
@@ -204,31 +235,41 @@ func (b *listBuilder) FilterWhere(filter string) *listBuilder {
 	return b
 }
 
-// SortAscBy adds an ascending sort to the query
+// SortAscBy adds an ascending sort on the specified column.
+// Multiple sort criteria can be added and will be applied in the order they were added.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) SortAscBy(column string) *listBuilder {
 	b.sorts = append(b.sorts, column)
 	return b
 }
 
-// SortDescBy adds a descending sort to the query
+// SortDescBy adds a descending sort on the specified column.
+// Multiple sort criteria can be added and will be applied in the order they were added.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) SortDescBy(column string) *listBuilder {
 	b.sorts = append(b.sorts, "-"+column)
 	return b
 }
 
-// Limit adds a limit to the query
+// Limit sets the maximum number of records to return.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) Limit(limit int) *listBuilder {
 	b.limit = limit
 	return b
 }
 
-// Offset adds an offset to the query
+// Offset sets the number of records to skip before returning results.
+// Used for pagination in conjunction with Limit.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) Offset(offset int) *listBuilder {
 	b.offset = offset
 	return b
 }
 
-// Page adds pagination to the query
+// Page configures pagination by setting both limit and offset based on page number and page size.
+// Page numbers start at 1. If page is less than 1, it defaults to 1.
+// If pageSize is less than 1, it defaults to 10.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) Page(page, pageSize int) *listBuilder {
 	if page < 1 {
 		page = 1
@@ -241,13 +282,17 @@ func (b *listBuilder) Page(page, pageSize int) *listBuilder {
 	return b
 }
 
-// ReturnFields adds specific fields to the query
+// ReturnFields specifies which fields to include in the response.
+// If not called, all fields will be returned.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) ReturnFields(fields ...string) *listBuilder {
 	b.fields = fields
 	return b
 }
 
-// Shuffle adds a shuffle parameter to the query
+// Shuffle enables or disables random ordering of results.
+// When enabled, results will be returned in a random order.
+// Returns the listBuilder for method chaining.
 func (b *listBuilder) Shuffle(shuffle bool) *listBuilder {
 	b.shuffle = shuffle
 	return b
@@ -275,13 +320,15 @@ type PageInfo struct {
 	IsLastPage bool `json:"isLastPage"`
 }
 
-// DecodeInto converts the list response into a slice of structs
-// It takes a pointer to a slice of structs as destination and populates it with the data
+// DecodeInto converts the list response data into a slice of the provided struct type.
+// It takes a pointer to a slice of structs as destination and populates it with the data.
+// Returns an error if the conversion fails.
 func (r ListResponse) DecodeInto(dest any) error {
 	return decodeInto(r.List, dest)
 }
 
-// Execute executes the list query
+// Execute performs the list operation with the configured parameters.
+// Returns a ListResponse containing the records and pagination information, or an error if the operation fails.
 func (b *listBuilder) Execute() (ListResponse, error) {
 	query := url.Values{}
 

@@ -15,8 +15,9 @@ type createBuilder struct {
 	chainErr error // Stores any error in the chain of methods
 }
 
-// CreateRecord initiates the construction of a create query
-// The data parameter can be either a map[string]any or a struct with JSON tags
+// CreateRecord initiates the construction of a create operation for a single record.
+// It accepts data which can be either a map[string]any or a struct with JSON tags.
+// Returns a createBuilder for further configuration and execution.
 func (t *Table) CreateRecord(data any) *createBuilder {
 	var dataMap map[string]any
 	var err error
@@ -36,13 +37,16 @@ func (t *Table) CreateRecord(data any) *createBuilder {
 	}
 }
 
-// WithContext sets the context for the query
+// WithContext sets the context for the create operation.
+// This allows for request cancellation and timeout control.
+// Returns the createBuilder for method chaining.
 func (b *createBuilder) WithContext(ctx context.Context) *createBuilder {
 	b.ctx = ctx
 	return b
 }
 
-// Execute executes the create query
+// Execute performs the create operation with the configured parameters.
+// Returns the ID of the created record or an error if the operation fails.
 func (b *createBuilder) Execute() (int, error) {
 	if b.chainErr != nil {
 		return 0, fmt.Errorf("error in the chain of methods: %w", b.chainErr)
@@ -71,8 +75,9 @@ type bulkCreateBuilder struct {
 	chainErr error // Stores any error in the chain of methods
 }
 
-// BulkCreateRecords initiates the construction of a bulk create query
-// The data parameter can be either a []map[string]any or a slice of structs with JSON tags
+// BulkCreateRecords initiates the construction of a bulk create operation for multiple records.
+// It accepts data which can be either a []map[string]any or a slice of structs with JSON tags.
+// Returns a bulkCreateBuilder for further configuration and execution.
 func (t *Table) BulkCreateRecords(data any) *bulkCreateBuilder {
 	var dataMaps []map[string]any
 	var err error
@@ -92,13 +97,16 @@ func (t *Table) BulkCreateRecords(data any) *bulkCreateBuilder {
 	}
 }
 
-// WithContext sets the context for the query
+// WithContext sets the context for the bulk create operation.
+// This allows for request cancellation and timeout control.
+// Returns the bulkCreateBuilder for method chaining.
 func (b *bulkCreateBuilder) WithContext(ctx context.Context) *bulkCreateBuilder {
 	b.ctx = ctx
 	return b
 }
 
-// Execute executes the bulk create query
+// Execute performs the bulk create operation with the configured parameters.
+// Returns a slice of IDs for the created records or an error if the operation fails.
 func (b *bulkCreateBuilder) Execute() ([]int, error) {
 	if b.chainErr != nil {
 		return nil, fmt.Errorf("error in the chain of methods: %w", b.chainErr)

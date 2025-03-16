@@ -221,6 +221,45 @@ if err != nil {
 }
 ```
 
+### Working with linked records
+
+```go
+// List linked records
+linkedRecords, err := table.ListLinkedRecords("link-field-id", recordID).
+    WithContext(context.Background()).
+    ReturnFields("Name", "Email").
+    SortAscBy("Name").
+    Limit(10).
+    FilterGreaterThan("Age", "18").
+    Execute()
+if err != nil {
+    // Handle error
+}
+
+// Decode the linked records into a struct
+var linkedUsers []User
+err = linkedRecords.DecodeInto(&linkedUsers)
+if err != nil {
+    // Handle error
+}
+
+// Link records
+err = table.LinkRecords("link-field-id", recordID, []int{1, 2, 3}).
+    WithContext(context.Background()).
+    Execute()
+if err != nil {
+    // Handle error
+}
+
+// Unlink records
+err = table.UnlinkRecords("link-field-id", recordID, []int{1, 2}).
+    WithContext(context.Background()).
+    Execute()
+if err != nil {
+    // Handle error
+}
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file

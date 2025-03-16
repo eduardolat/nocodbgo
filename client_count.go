@@ -16,9 +16,9 @@ type countBuilder struct {
 	filters []string
 }
 
-// Count initiates the construction of a query to count records in a table.
+// CountRecords initiates the construction of a query to count records in a table.
 // Returns a countBuilder for further configuration and execution.
-func (t *Table) Count() *countBuilder {
+func (t *Table) CountRecords() *countBuilder {
 	return &countBuilder{
 		table: t,
 		ctx:   nil,

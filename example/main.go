@@ -104,7 +104,7 @@ func main() {
 	fmt.Printf("Decoded users: %+v\n", users)
 
 	// Count users using the chain pattern
-	count, err := table.Count().
+	count, err := table.CountRecords().
 		WithContext(context.Background()).
 		FilterGreaterThan("Number", "18").
 		Execute()
@@ -211,7 +211,7 @@ func main() {
 	fmt.Printf("Users with custom filter: %v\n", customFilterResult.List)
 
 	// Using FilterWhere with Count
-	customFilterCount, err := table.Count().
+	customFilterCount, err := table.CountRecords().
 		WithContext(context.Background()).
 		FilterWhere("(SingleLineText,like,%Smith)~and(Number,gt,20)").
 		Execute()

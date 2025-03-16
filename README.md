@@ -143,7 +143,7 @@ if err != nil {
 }
 
 // Count records
-count, err := table.Count().
+count, err := table.CountRecords().
     WithContext(context.Background()).
     FilterGreaterThan("Age", "18").
     Execute()

@@ -320,6 +320,46 @@ type PageInfo struct {
 	IsLastPage bool `json:"isLastPage"`
 }
 
+// UnmarshalJSON implements the json.Unmarshaler interface for ListResponse.
+// It handles both list responses with pagination and single object responses.
+func (r *ListResponse) UnmarshalJSON(data []byte) error {
+	// First try to unmarshal as a standard list response
+	type StandardResponse ListResponse
+	var standardResp StandardResponse
+
+	err := json.Unmarshal(data, &standardResp)
+	if err == nil {
+		// Check if it's a valid list response (has list field)
+		var rawMap map[string]json.RawMessage
+		if err := json.Unmarshal(data, &rawMap); err == nil {
+			if _, hasList := rawMap["list"]; hasList {
+				// It's a standard list response
+				*r = ListResponse(standardResp)
+				return nil
+			}
+		}
+	}
+
+	// If that fails or it's not a standard list response, try to unmarshal as a single object
+	var singleObject map[string]any
+	err = json.Unmarshal(data, &singleObject)
+	if err == nil && len(singleObject) > 0 {
+		// Successfully unmarshaled as a single object
+		r.List = []map[string]any{singleObject}
+		r.PageInfo = PageInfo{
+			TotalRows:   1,
+			Page:        1,
+			PageSize:    1,
+			IsFirstPage: true,
+			IsLastPage:  true,
+		}
+		return nil
+	}
+
+	// If both attempts fail, return the original error
+	return fmt.Errorf("failed to unmarshal response: %w", err)
+}
+
 // DecodeInto converts the list response data into a slice of the provided struct type.
 // It takes a pointer to a slice of structs as destination and populates it with the data.
 // Returns an error if the conversion fails.

@@ -46,9 +46,9 @@ func (s *sortable[T]) apply(query url.Values) {
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
-func (s *sortable[T]) SortAscBy(column string) *sortable[T] {
+func (s *sortable[T]) SortAscBy(column string) T {
 	s.rawSorts = append(s.rawSorts, column)
-	return s
+	return s.builder
 }
 
 // SortDescBy adds a descending sort on the specified column.
@@ -63,7 +63,7 @@ func (s *sortable[T]) SortAscBy(column string) *sortable[T] {
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
-func (s *sortable[T]) SortDescBy(column string) *sortable[T] {
+func (s *sortable[T]) SortDescBy(column string) T {
 	s.rawSorts = append(s.rawSorts, "-"+column)
-	return s
+	return s.builder
 }

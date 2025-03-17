@@ -37,7 +37,7 @@ func (s *shuffleable[T]) apply(query url.Values) {
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
-func (s *shuffleable[T]) Shuffle() *shuffleable[T] {
+func (s *shuffleable[T]) Shuffle() T {
 	s.shuffle = true
-	return s
+	return s.builder
 }

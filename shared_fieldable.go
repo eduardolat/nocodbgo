@@ -45,7 +45,7 @@ func (f *fieldable[T]) apply(query url.Values) {
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
-func (f *fieldable[T]) ReturnFields(fields ...string) *fieldable[T] {
+func (f *fieldable[T]) ReturnFields(fields ...string) T {
 	f.rawFields = fields
-	return f
+	return f.builder
 }

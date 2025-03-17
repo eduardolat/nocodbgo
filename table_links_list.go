@@ -22,11 +22,11 @@ type listLinksBuilder struct {
 	fieldProvider[*listLinksBuilder]
 }
 
-// ListLinks initializes a query builder to list linked records for a specified link field and local record.
+// ListLinks lists the target table records linked to a local table record via a specified link field.
 //
 // Parameters:
 //   - localLinkFieldID: the identifier of the link field used to associate records.
-//   - localRecordID: the identifier of the local record whose linked records are being retrieved.
+//   - localRecordID: the identifier of the local table record whose linked records are being retrieved.
 func (t *Table) ListLinks(localLinkFieldID string, localRecordID int) *listLinksBuilder {
 	b := &listLinksBuilder{
 		table:            t,
@@ -43,10 +43,7 @@ func (t *Table) ListLinks(localLinkFieldID string, localRecordID int) *listLinks
 	return b
 }
 
-// Execute finalizes the configured query and sends the request to retrieve the linked records.
-//
-// It returns a ListResponse containing the records and associated pagination details,
-// or an error if the operation fails.
+// Execute finalizes and executes the operation.
 func (b *listLinksBuilder) Execute() (ListResponse, error) {
 	if b.localLinkFieldID == "" {
 		return ListResponse{}, ErrLinkFieldIDRequired

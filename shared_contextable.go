@@ -13,13 +13,15 @@ type contextable[T any] struct {
 func newContextable[T any](builder T) contextable[T] {
 	return contextable[T]{
 		builder: builder,
-		ctx:     nil,
+		ctx:     context.Background(),
 	}
 }
 
 // WithContext sets the context for the operation.
 //
 // This allows for request cancellation and timeout control.
+//
+// If not set, the context will default to context.Background().
 func (c *contextable[T]) WithContext(ctx context.Context) T {
 	c.ctx = ctx
 	return c.builder

@@ -28,10 +28,15 @@ func newSortable[T any](builder T) sortable[T] {
 
 // apply takes the url.Values and adds the "sort" query parameter to it with all the sorts
 // that have been added to the sortable instance.
-func (s *sortable[T]) apply(query url.Values) {
-	if len(s.rawSorts) > 0 {
-		query.Set("sort", strings.Join(s.rawSorts, ","))
+//
+// It returns a new copy of the provided url.Values with the "sort" query parameter added.
+func (s *sortable[T]) apply(query url.Values) url.Values {
+	if query == nil || len(s.rawSorts) < 1 {
+		return query
 	}
+
+	query.Set("sort", strings.Join(s.rawSorts, ","))
+	return query
 }
 
 // SortAscBy adds an ascending sort on the specified column.

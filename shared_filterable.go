@@ -30,10 +30,15 @@ func newFilterable[T any](builder T) filterable[T] {
 
 // apply takes the url.Values and adds the "where" query parameter to it with all the filters
 // that have been added to the filterable instance.
-func (f *filterable[T]) apply(query url.Values) {
-	if len(f.rawFilters) > 0 {
-		query.Set("where", strings.Join(f.rawFilters, "~and"))
+//
+// It returns a new copy of the provided url.Values with the "where" query parameter added.
+func (f *filterable[T]) apply(query url.Values) url.Values {
+	if query == nil || len(f.rawFilters) < 1 {
+		return query
 	}
+
+	query.Set("where", strings.Join(f.rawFilters, "~and"))
+	return query
 }
 
 // Where adds a custom filter expression to the "where" query parameter of the request.

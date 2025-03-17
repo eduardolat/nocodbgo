@@ -10,8 +10,8 @@ import "net/url"
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 type viewSelectable[T any] struct {
-	builder T
-	viewId  string
+	builder   T
+	rawViewID string
 }
 
 // newViewSelectable creates a new viewSelectable instance with the given builder.
@@ -23,10 +23,15 @@ func newViewSelectable[T any](builder T) viewSelectable[T] {
 
 // apply takes the url.Values and adds the "viewId" query parameter to it with the value
 // that has been set on the viewSelectable instance.
-func (v *viewSelectable[T]) apply(query url.Values) {
-	if v.viewId != "" {
-		query.Set("viewId", v.viewId)
+//
+// It returns a new copy of the provided url.Values with the "viewId" query parameter added.
+func (v *viewSelectable[T]) apply(query url.Values) url.Values {
+	if query == nil || v.rawViewID == "" {
+		return query
 	}
+
+	query.Set("viewId", v.rawViewID)
+	return query
 }
 
 // WithViewId specifies the view identifier to fetch records that are currently visible within a specific view.
@@ -47,7 +52,7 @@ func (v *viewSelectable[T]) apply(query url.Values) {
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 func (v *viewSelectable[T]) WithViewId(viewId string) T {
 	if viewId != "" {
-		v.viewId = viewId
+		v.rawViewID = viewId
 	}
 	return v.builder
 }

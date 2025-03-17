@@ -13,9 +13,9 @@ import (
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 type pageable[T any] struct {
-	builder T
-	limit   int
-	offset  int
+	builder   T
+	rawLimit  int
+	rawOffset int
 }
 
 // newPageable creates a new pageable instance with the given builder and apply function.
@@ -28,13 +28,21 @@ func newPageable[T any](builder T) pageable[T] {
 
 // apply takes the url.Values and adds the "limit" and "offset" query parameters to it with the values
 // that have been added to the pageable instance.
-func (p *pageable[T]) apply(query url.Values) {
-	if p.limit > 0 {
-		query.Set("limit", strconv.Itoa(p.limit))
+//
+// It returns a new copy of the provided url.Values with the "limit" and "offset" query parameters added.
+func (p *pageable[T]) apply(query url.Values) url.Values {
+	if query == nil {
+		return query
 	}
-	if p.offset > 0 {
-		query.Set("offset", strconv.Itoa(p.offset))
+
+	if p.rawLimit > 0 {
+		query.Set("limit", strconv.Itoa(p.rawLimit))
 	}
+	if p.rawOffset > 0 {
+		query.Set("offset", strconv.Itoa(p.rawOffset))
+	}
+
+	return query
 }
 
 // Limit sets the limit for the number of records to return from the query.
@@ -46,7 +54,7 @@ func (p *pageable[T]) Limit(limit int) T {
 		return p.builder
 	}
 
-	p.limit = limit
+	p.rawLimit = limit
 	return p.builder
 }
 
@@ -59,7 +67,7 @@ func (p *pageable[T]) Offset(offset int) T {
 		return p.builder
 	}
 
-	p.offset = offset
+	p.rawOffset = offset
 	return p.builder
 }
 
@@ -74,7 +82,7 @@ func (p *pageable[T]) Page(page int, pageSize int) T {
 		return p.builder
 	}
 
-	p.limit = pageSize
-	p.offset = (page - 1) * pageSize
+	p.rawLimit = pageSize
+	p.rawOffset = (page - 1) * pageSize
 	return p.builder
 }

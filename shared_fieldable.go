@@ -28,10 +28,15 @@ func newFieldable[T any](builder T) fieldable[T] {
 
 // apply takes the url.Values and adds the "fields" query parameter to it with all the fields
 // that have been added to the fieldable instance.
-func (f *fieldable[T]) apply(query url.Values) {
-	if len(f.rawFields) > 0 {
-		query.Set("fields", strings.Join(f.rawFields, ","))
+//
+// It returns a new copy of the provided url.Values with the "fields" query parameter added.
+func (f *fieldable[T]) apply(query url.Values) url.Values {
+	if query == nil || len(f.rawFields) < 1 {
+		return query
 	}
+
+	query.Set("fields", strings.Join(f.rawFields, ","))
+	return query
 }
 
 // ReturnFields specifies which fields to include in the response.

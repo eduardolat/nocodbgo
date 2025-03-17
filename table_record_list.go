@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 // listRecordsBuilder is used to build a list query with a fluent API
@@ -62,41 +63,52 @@ type PageInfo struct {
 // UnmarshalJSON implements the json.Unmarshaler interface for ListResponse.
 // It handles both list responses with pagination and single object responses.
 func (r *ListResponse) UnmarshalJSON(data []byte) error {
-	// First try to unmarshal as a standard list response
-	type StandardResponse ListResponse
-	var standardResp StandardResponse
-
-	err := json.Unmarshal(data, &standardResp)
-	if err == nil {
-		// Check if it's a valid list response (has list field)
-		var rawMap map[string]json.RawMessage
-		if err := json.Unmarshal(data, &rawMap); err == nil {
-			if _, hasList := rawMap["list"]; hasList {
-				// It's a standard list response
-				*r = ListResponse(standardResp)
-				return nil
-			}
-		}
+	if r == nil {
+		r = &ListResponse{}
+		r.List = []map[string]any{}
+		r.PageInfo = PageInfo{}
 	}
 
-	// If that fails or it's not a standard list response, try to unmarshal as a single object
-	var singleObject map[string]any
-	err = json.Unmarshal(data, &singleObject)
-	if err == nil && len(singleObject) > 0 {
-		// Successfully unmarshaled as a single object
-		r.List = []map[string]any{singleObject}
-		r.PageInfo = PageInfo{
-			TotalRows:   1,
-			Page:        1,
-			PageSize:    1,
-			IsFirstPage: true,
-			IsLastPage:  true,
-		}
+	if len(data) <= 2 {
 		return nil
 	}
 
-	// If both attempts fail, return the original error
-	return fmt.Errorf("failed to unmarshal response: %w", err)
+	dataStr := string(data)
+	isObject := strings.HasPrefix(dataStr, "{") && strings.HasSuffix(dataStr, "}")
+	if dataStr == "{}" || !isObject {
+		return nil
+	}
+
+	var rawMap map[string]any
+	if err := json.Unmarshal(data, &rawMap); err != nil {
+		return fmt.Errorf("failed to unmarshal list response: %w", err)
+	}
+
+	_, hasList := rawMap["list"]
+	_, hasPageInfo := rawMap["pageInfo"]
+	if hasList && hasPageInfo && len(rawMap) == 2 {
+		// Avoid recursion by using a type alias
+		type Alias ListResponse
+		var aux Alias
+
+		if err := json.Unmarshal(data, &aux); err != nil {
+			return fmt.Errorf("failed to unmarshal list response: %w", err)
+		}
+
+		// Copy the data back to r
+		*r = ListResponse(aux)
+		return nil
+	}
+
+	r.List = []map[string]any{rawMap}
+	r.PageInfo = PageInfo{
+		TotalRows:   1,
+		Page:        1,
+		PageSize:    1,
+		IsFirstPage: true,
+		IsLastPage:  true,
+	}
+	return nil
 }
 
 // DecodeInto converts the list response data into a slice of the provided struct type.

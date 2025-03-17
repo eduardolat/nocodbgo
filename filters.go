@@ -268,7 +268,9 @@ func (f *filters[T]) WhereNotIsBetween(column string, min, max string) T {
 	return f.builder
 }
 
-// WhereIsLike adds a filter to match records where the specified column's value matches the given pattern.
+// WhereIsLike adds a filter to the "where" query parameter of the request that matches
+// records where the specified column's value matches the given pattern.
+//
 // The pattern can include "%" as a wildcard for any sequence of characters.
 //
 // Example:
@@ -286,7 +288,9 @@ func (f *filters[T]) WhereIsLike(column string, value string) T {
 	return f.builder
 }
 
-// WhereIsNotLike adds a filter to match records where the specified column's value does not match the given pattern.
+// WhereIsNotLike adds a filter to the "where" query parameter of the request that matches
+// records where the specified column's value does not match the given pattern.
+//
 // The pattern can include "%" as a wildcard for any sequence of characters.
 //
 // Example:
@@ -304,7 +308,9 @@ func (f *filters[T]) WhereIsNotLike(column string, value string) T {
 	return f.builder
 }
 
-// WhereIsWithin adds a filter for date/datetime columns to match records within a specific time range.
+// WhereIsWithin adds a filter to the "where" query parameter of the request that matches
+// records where the specified column's value is within a specific time range.
+//
 // The subOperation parameter specifies the time range (e.g., "today", "yesterday", "thisWeek").
 //
 // This is only available for Date/DateTime columns and you can use the following subOperations:

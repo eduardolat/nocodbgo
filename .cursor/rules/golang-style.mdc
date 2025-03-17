@@ -1,7 +1,7 @@
 ---
-description: This document describes how the golang code must be styled
-globs: *.go
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
 
 # Go Style
@@ -13,3 +13,7 @@ alwaysApply: false
 ## How to test Go code?
 
 To test Golang code you should ALWAYS use the `task test` command, literally.
+
+## How to lint Go code?
+
+To lint Golang code you should ALWAYS use the `task lint` command, literally.

@@ -1,5 +1,5 @@
 ---
-description: These are the websites where you can find the NocoDB API documentation
+description: 
 globs: 
 alwaysApply: true
 ---
@@ -24,9 +24,14 @@ In the links below you can find information on how to use the data API's.
 https://data-apis-v2.nocodb.com
 https://data-apis-v2.nocodb.com/swagger-v2.json
 
+The swagger-v2.json file is downloaded locally and renamed to `openapi.json`
+
 ## Meta API's
 
 In the links below you can find information on how to use the meta API's.
 
 https://meta-apis-v2.nocodb.com
 https://meta-apis-v2.nocodb.com/swagger-v2.json
+
+The swagger-v2.json file is downloaded locally and renamed to `openapi.json`
+

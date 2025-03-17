@@ -1,7 +1,6 @@
 package nocodbgo
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 )
@@ -9,10 +8,11 @@ import (
 // updateBuilder is used to build an update query with a fluent API
 type updateBuilder struct {
 	table    *Table
-	ctx      context.Context
 	recordID int
 	data     map[string]any
 	chainErr error // Stores any error in the chain of methods
+
+	contextable[*updateBuilder]
 }
 
 // UpdateRecord initiates the construction of an update query for a single record.
@@ -29,20 +29,15 @@ func (t *Table) UpdateRecord(recordID int, data any) *updateBuilder {
 		dataMap, err = structToMap(data)
 	}
 
-	return &updateBuilder{
+	b := &updateBuilder{
 		table:    t,
-		ctx:      nil,
 		recordID: recordID,
 		data:     dataMap,
 		chainErr: err,
 	}
-}
 
-// WithContext sets the context for the update operation.
-// This allows for request cancellation and timeout control.
-// Returns the updateBuilder for method chaining.
-func (b *updateBuilder) WithContext(ctx context.Context) *updateBuilder {
-	b.ctx = ctx
+	b.contextable = newContextable(b)
+
 	return b
 }
 
@@ -66,7 +61,7 @@ func (b *updateBuilder) Execute() error {
 
 	err := b.table.
 		BulkUpdateRecords([]map[string]any{updateData}).
-		WithContext(b.ctx).
+		WithContext(b.contextable.ctx).
 		Execute()
 	if err != nil {
 		return fmt.Errorf("failed to update record: %w", err)
@@ -78,9 +73,10 @@ func (b *updateBuilder) Execute() error {
 // bulkUpdateBuilder is used to build a bulk update query with a fluent API
 type bulkUpdateBuilder struct {
 	table    *Table
-	ctx      context.Context
 	data     []map[string]any
 	chainErr error // Stores any error in the chain of methods
+
+	contextable[*bulkUpdateBuilder]
 }
 
 // BulkUpdateRecords initiates the construction of a bulk update query for multiple records.
@@ -98,19 +94,14 @@ func (t *Table) BulkUpdateRecords(data any) *bulkUpdateBuilder {
 		dataMaps, err = structsToMaps(data)
 	}
 
-	return &bulkUpdateBuilder{
+	b := &bulkUpdateBuilder{
 		table:    t,
-		ctx:      nil,
 		data:     dataMaps,
 		chainErr: err,
 	}
-}
 
-// WithContext sets the context for the bulk update operation.
-// This allows for request cancellation and timeout control.
-// Returns the bulkUpdateBuilder for method chaining.
-func (b *bulkUpdateBuilder) WithContext(ctx context.Context) *bulkUpdateBuilder {
-	b.ctx = ctx
+	b.contextable = newContextable(b)
+
 	return b
 }
 
@@ -122,7 +113,7 @@ func (b *bulkUpdateBuilder) Execute() error {
 	}
 
 	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)
-	_, err := b.table.client.request(b.ctx, http.MethodPatch, path, b.data, nil)
+	_, err := b.table.client.request(b.contextable.ctx, http.MethodPatch, path, b.data, nil)
 	if err != nil {
 		return fmt.Errorf("failed to update records: %w", err)
 	}

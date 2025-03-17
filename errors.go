@@ -14,4 +14,7 @@ var (
 
 	// ErrRowIDRequired is returned when attempting to perform an operation that requires a row ID without providing one
 	ErrRowIDRequired = errors.New("row ID is required")
+
+	// ErrLinkFieldIDRequired is returned when attempting to perform an operation that requires a link field ID without providing one
+	ErrLinkFieldIDRequired = errors.New("link field ID is required")
 )

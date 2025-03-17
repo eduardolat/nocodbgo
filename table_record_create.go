@@ -1,7 +1,6 @@
 package nocodbgo
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -10,9 +9,10 @@ import (
 // createBuilder is used to build a create query with a fluent API
 type createBuilder struct {
 	table    *Table
-	ctx      context.Context
 	data     map[string]any
 	chainErr error // Stores any error in the chain of methods
+
+	contextable[*createBuilder]
 }
 
 // CreateRecord initiates the construction of a create operation for a single record.
@@ -29,19 +29,14 @@ func (t *Table) CreateRecord(data any) *createBuilder {
 		dataMap, err = structToMap(data)
 	}
 
-	return &createBuilder{
+	b := &createBuilder{
 		table:    t,
-		ctx:      nil,
 		data:     dataMap,
 		chainErr: err,
 	}
-}
 
-// WithContext sets the context for the create operation.
-// This allows for request cancellation and timeout control.
-// Returns the createBuilder for method chaining.
-func (b *createBuilder) WithContext(ctx context.Context) *createBuilder {
-	b.ctx = ctx
+	b.contextable = newContextable(b)
+
 	return b
 }
 
@@ -54,7 +49,7 @@ func (b *createBuilder) Execute() (int, error) {
 
 	records, err := b.table.
 		BulkCreateRecords([]map[string]any{b.data}).
-		WithContext(b.ctx).
+		WithContext(b.contextable.ctx).
 		Execute()
 	if err != nil {
 		return 0, fmt.Errorf("failed to create record: %w", err)
@@ -70,9 +65,10 @@ func (b *createBuilder) Execute() (int, error) {
 // bulkCreateBuilder is used to build a bulk create query with a fluent API
 type bulkCreateBuilder struct {
 	table    *Table
-	ctx      context.Context
 	data     []map[string]any
 	chainErr error // Stores any error in the chain of methods
+
+	contextable[*bulkCreateBuilder]
 }
 
 // BulkCreateRecords initiates the construction of a bulk create operation for multiple records.
@@ -89,19 +85,14 @@ func (t *Table) BulkCreateRecords(data any) *bulkCreateBuilder {
 		dataMaps, err = structsToMaps(data)
 	}
 
-	return &bulkCreateBuilder{
+	b := &bulkCreateBuilder{
 		table:    t,
-		ctx:      nil,
 		data:     dataMaps,
 		chainErr: err,
 	}
-}
 
-// WithContext sets the context for the bulk create operation.
-// This allows for request cancellation and timeout control.
-// Returns the bulkCreateBuilder for method chaining.
-func (b *bulkCreateBuilder) WithContext(ctx context.Context) *bulkCreateBuilder {
-	b.ctx = ctx
+	b.contextable = newContextable(b)
+
 	return b
 }
 
@@ -113,7 +104,7 @@ func (b *bulkCreateBuilder) Execute() ([]int, error) {
 	}
 
 	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)
-	respBody, err := b.table.client.request(b.ctx, http.MethodPost, path, b.data, nil)
+	respBody, err := b.table.client.request(b.contextable.ctx, http.MethodPost, path, b.data, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create records: %w", err)
 	}

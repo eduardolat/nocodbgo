@@ -5,7 +5,9 @@ import (
 	"net/http"
 )
 
-// deleteLinkBuilder is used to build an unlink records operation with a fluent API
+// deleteLinkBuilder provides a fluent interface for configuring an operation to unlink a single target record
+// from a local record via a specified link field. It encapsulates the local record and target record identifiers
+// along with necessary context without revealing implementation details.
 type deleteLinkBuilder struct {
 	table            *Table
 	localLinkFieldID string
@@ -15,9 +17,10 @@ type deleteLinkBuilder struct {
 	contextProvider[*deleteLinkBuilder]
 }
 
-// DeleteLink initiates the construction of an operation to unlink a record from a specific link field and record ID.
+// DeleteLink begins constructing an unlink operation for a single record.
 //
-// It accepts a link field ID, a record ID, and a target record ID to unlink.
+// It takes the local link field ID, the identifier of the local record from which to remove the link,
+// and the target record ID that is to be unlinked.
 func (t *Table) DeleteLink(localLinkFieldID string, localRecordID int, targetRecordID int) *deleteLinkBuilder {
 	b := &deleteLinkBuilder{
 		table:            t,
@@ -31,7 +34,10 @@ func (t *Table) DeleteLink(localLinkFieldID string, localRecordID int, targetRec
 	return b
 }
 
-// Execute performs the unlink record operation with the configured parameters.
+// Execute finalizes the unlink operation configured in the builder.
+//
+// It internally delegates to the multi-unlink operation by converting the single target record ID into a slice,
+// and returns an error if the unlink process fails.
 func (b *deleteLinkBuilder) Execute() error {
 	if b.localLinkFieldID == "" {
 		return ErrLinkFieldIDRequired
@@ -51,7 +57,8 @@ func (b *deleteLinkBuilder) Execute() error {
 		Execute()
 }
 
-// deleteLinksBuilder is used to build an unlink records operation with a fluent API
+// deleteLinksBuilder provides a fluent interface for configuring an operation to unlink multiple target records
+// from a local record via a specified link field. It bundles together all required identifiers and context.
 type deleteLinksBuilder struct {
 	table            *Table
 	localLinkFieldID string
@@ -61,9 +68,10 @@ type deleteLinksBuilder struct {
 	contextProvider[*deleteLinksBuilder]
 }
 
-// DeleteLinks initiates the construction of an operation to unlink records from a specific link field and record ID.
+// DeleteLinks begins constructing an unlink operation for multiple target records.
 //
-// It accepts a link field ID, a record ID, and a slice of record IDs to unlink.
+// It accepts the local link field ID, the local record ID from which links need to be removed,
+// and a slice of target record IDs to be unlinked.
 func (t *Table) DeleteLinks(localLinkFieldID string, localRecordID int, targetRecordIDs []int) *deleteLinksBuilder {
 	b := &deleteLinksBuilder{
 		table:            t,
@@ -77,7 +85,9 @@ func (t *Table) DeleteLinks(localLinkFieldID string, localRecordID int, targetRe
 	return b
 }
 
-// Execute performs the unlink records operation with the configured parameters.
+// Execute finalizes and executes the unlink operation using the builder's configuration.
+//
+// It performs the removal of links for all specified target records and returns an error if the process fails.
 func (b *deleteLinksBuilder) Execute() error {
 	if b.localLinkFieldID == "" {
 		return ErrLinkFieldIDRequired

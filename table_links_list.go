@@ -7,7 +7,9 @@ import (
 	"net/url"
 )
 
-// listLinksBuilder is used to build a query to list linked records with a fluent API
+// listLinksBuilder provides a fluent interface for constructing a query to retrieve linked records.
+// It encapsulates the necessary query options—such as filters, sorting, pagination, and field selection—for
+// fetching records associated with a specified link field and local record.
 type listLinksBuilder struct {
 	table            *Table
 	localLinkFieldID string
@@ -20,9 +22,11 @@ type listLinksBuilder struct {
 	fieldProvider[*listLinksBuilder]
 }
 
-// ListLinks initiates the construction of a query to list linked records for a specific link field and record ID.
+// ListLinks initializes a query builder to list linked records for a specified link field and local record.
 //
-// It accepts a link field ID and a record ID to identify which linked records to retrieve.
+// Parameters:
+//   - localLinkFieldID: the identifier of the link field used to associate records.
+//   - localRecordID: the identifier of the local record whose linked records are being retrieved.
 func (t *Table) ListLinks(localLinkFieldID string, localRecordID int) *listLinksBuilder {
 	b := &listLinksBuilder{
 		table:            t,
@@ -39,8 +43,10 @@ func (t *Table) ListLinks(localLinkFieldID string, localRecordID int) *listLinks
 	return b
 }
 
-// Execute performs the list linked records operation with the configured parameters.
-// Returns a ListResponse containing the linked records and pagination information, or an error if the operation fails.
+// Execute finalizes the configured query and sends the request to retrieve the linked records.
+//
+// It returns a ListResponse containing the records and associated pagination details,
+// or an error if the operation fails.
 func (b *listLinksBuilder) Execute() (ListResponse, error) {
 	if b.localLinkFieldID == "" {
 		return ListResponse{}, ErrLinkFieldIDRequired

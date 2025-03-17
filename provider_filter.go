@@ -212,6 +212,23 @@ func (f *filterProvider[T]) WhereIsTrue(column string) T {
 	return f.builder
 }
 
+// WhereIsNotTrue adds a filter to the "where" query parameter of the request that matches
+// records where the specified column is not true.
+//
+// Example:
+//
+//	// Where MyField is not true
+//	query = query.WhereIsNotTrue("MyField")
+//
+// Documentation:
+//   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
+//   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
+func (f *filterProvider[T]) WhereIsNotTrue(column string) T {
+	filter := fmt.Sprintf("(%s,isnot,true)", column)
+	f.rawFilters = append(f.rawFilters, filter)
+	return f.builder
+}
+
 // WhereIsFalse adds a filter to the "where" query parameter of the request that matches
 // records where the specified column is false.
 //
@@ -225,6 +242,23 @@ func (f *filterProvider[T]) WhereIsTrue(column string) T {
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
 func (f *filterProvider[T]) WhereIsFalse(column string) T {
 	filter := fmt.Sprintf("(%s,is,false)", column)
+	f.rawFilters = append(f.rawFilters, filter)
+	return f.builder
+}
+
+// WhereIsNotFalse adds a filter to the "where" query parameter of the request that matches
+// records where the specified column is not false.
+//
+// Example:
+//
+//	// Where MyField is not false
+//	query = query.WhereIsNotFalse("MyField")
+//
+// Documentation:
+//   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
+//   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
+func (f *filterProvider[T]) WhereIsNotFalse(column string) T {
+	filter := fmt.Sprintf("(%s,isnot,false)", column)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
 }

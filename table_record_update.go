@@ -5,20 +5,20 @@ import (
 	"net/http"
 )
 
-// updateBuilder is used to build an update query with a fluent API
-type updateBuilder struct {
+// updateRecordBuilder is used to build an update query with a fluent API
+type updateRecordBuilder struct {
 	table    *Table
 	recordID int
 	data     map[string]any
 	chainErr error // Stores any error in the chain of methods
 
-	contextProvider[*updateBuilder]
+	contextProvider[*updateRecordBuilder]
 }
 
 // UpdateRecord initiates the construction of an update query for a single record.
+//
 // It accepts a record ID and the data to update, which can be either a map[string]any or a struct with JSON tags.
-// Returns an updateBuilder for further configuration and execution.
-func (t *Table) UpdateRecord(recordID int, data any) *updateBuilder {
+func (t *Table) UpdateRecord(recordID int, data any) *updateRecordBuilder {
 	var dataMap map[string]any
 	var err error
 
@@ -29,7 +29,7 @@ func (t *Table) UpdateRecord(recordID int, data any) *updateBuilder {
 		dataMap, err = structToMap(data)
 	}
 
-	b := &updateBuilder{
+	b := &updateRecordBuilder{
 		table:    t,
 		recordID: recordID,
 		data:     dataMap,
@@ -43,7 +43,7 @@ func (t *Table) UpdateRecord(recordID int, data any) *updateBuilder {
 
 // Execute performs the update operation with the configured parameters.
 // Returns an error if the operation fails.
-func (b *updateBuilder) Execute() error {
+func (b *updateRecordBuilder) Execute() error {
 	if b.recordID == 0 {
 		return ErrRowIDRequired
 	}
@@ -60,7 +60,7 @@ func (b *updateBuilder) Execute() error {
 	updateData["Id"] = b.recordID
 
 	err := b.table.
-		BulkUpdateRecords([]map[string]any{updateData}).
+		UpdateRecords([]map[string]any{updateData}).
 		WithContext(b.contextProvider.ctx).
 		Execute()
 	if err != nil {
@@ -70,20 +70,21 @@ func (b *updateBuilder) Execute() error {
 	return nil
 }
 
-// bulkUpdateBuilder is used to build a bulk update query with a fluent API
-type bulkUpdateBuilder struct {
+// updateRecordsBuilder is used to build a bulk update query with a fluent API
+type updateRecordsBuilder struct {
 	table    *Table
 	data     []map[string]any
 	chainErr error // Stores any error in the chain of methods
 
-	contextProvider[*bulkUpdateBuilder]
+	contextProvider[*updateRecordsBuilder]
 }
 
-// BulkUpdateRecords initiates the construction of a bulk update query for multiple records.
+// UpdateRecords initiates the construction of a bulk update query for multiple records.
+//
 // It accepts data which can be either a []map[string]any or a slice of structs with JSON tags.
+//
 // Each record must have an "Id" field to identify which record to update.
-// Returns a bulkUpdateBuilder for further configuration and execution.
-func (t *Table) BulkUpdateRecords(data any) *bulkUpdateBuilder {
+func (t *Table) UpdateRecords(data any) *updateRecordsBuilder {
 	var dataMaps []map[string]any
 	var err error
 
@@ -94,7 +95,7 @@ func (t *Table) BulkUpdateRecords(data any) *bulkUpdateBuilder {
 		dataMaps, err = structsToMaps(data)
 	}
 
-	b := &bulkUpdateBuilder{
+	b := &updateRecordsBuilder{
 		table:    t,
 		data:     dataMaps,
 		chainErr: err,
@@ -107,7 +108,7 @@ func (t *Table) BulkUpdateRecords(data any) *bulkUpdateBuilder {
 
 // Execute performs the bulk update operation with the configured parameters.
 // Returns an error if the operation fails.
-func (b *bulkUpdateBuilder) Execute() error {
+func (b *updateRecordsBuilder) Execute() error {
 	if b.chainErr != nil {
 		return fmt.Errorf("error in the chain of methods: %w", b.chainErr)
 	}

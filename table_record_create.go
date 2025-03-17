@@ -6,19 +6,19 @@ import (
 	"net/http"
 )
 
-// createBuilder is used to build a create query with a fluent API
-type createBuilder struct {
+// createRecordBuilder is used to build a create query with a fluent API
+type createRecordBuilder struct {
 	table    *Table
 	data     map[string]any
 	chainErr error // Stores any error in the chain of methods
 
-	contextProvider[*createBuilder]
+	contextProvider[*createRecordBuilder]
 }
 
 // CreateRecord initiates the construction of a create operation for a single record.
+//
 // It accepts data which can be either a map[string]any or a struct with JSON tags.
-// Returns a createBuilder for further configuration and execution.
-func (t *Table) CreateRecord(data any) *createBuilder {
+func (t *Table) CreateRecord(data any) *createRecordBuilder {
 	var dataMap map[string]any
 	var err error
 
@@ -29,7 +29,7 @@ func (t *Table) CreateRecord(data any) *createBuilder {
 		dataMap, err = structToMap(data)
 	}
 
-	b := &createBuilder{
+	b := &createRecordBuilder{
 		table:    t,
 		data:     dataMap,
 		chainErr: err,
@@ -42,13 +42,13 @@ func (t *Table) CreateRecord(data any) *createBuilder {
 
 // Execute performs the create operation with the configured parameters.
 // Returns the ID of the created record or an error if the operation fails.
-func (b *createBuilder) Execute() (int, error) {
+func (b *createRecordBuilder) Execute() (int, error) {
 	if b.chainErr != nil {
 		return 0, fmt.Errorf("error in the chain of methods: %w", b.chainErr)
 	}
 
 	records, err := b.table.
-		BulkCreateRecords([]map[string]any{b.data}).
+		CreateRecords([]map[string]any{b.data}).
 		WithContext(b.contextProvider.ctx).
 		Execute()
 	if err != nil {
@@ -62,19 +62,19 @@ func (b *createBuilder) Execute() (int, error) {
 	return records[0], nil
 }
 
-// bulkCreateBuilder is used to build a bulk create query with a fluent API
-type bulkCreateBuilder struct {
+// createRecordsBuilder is used to build a bulk create query with a fluent API
+type createRecordsBuilder struct {
 	table    *Table
 	data     []map[string]any
 	chainErr error // Stores any error in the chain of methods
 
-	contextProvider[*bulkCreateBuilder]
+	contextProvider[*createRecordsBuilder]
 }
 
-// BulkCreateRecords initiates the construction of a bulk create operation for multiple records.
+// CreateRecords initiates the construction of a bulk create operation for multiple records.
+//
 // It accepts data which can be either a []map[string]any or a slice of structs with JSON tags.
-// Returns a bulkCreateBuilder for further configuration and execution.
-func (t *Table) BulkCreateRecords(data any) *bulkCreateBuilder {
+func (t *Table) CreateRecords(data any) *createRecordsBuilder {
 	var dataMaps []map[string]any
 	var err error
 
@@ -85,7 +85,7 @@ func (t *Table) BulkCreateRecords(data any) *bulkCreateBuilder {
 		dataMaps, err = structsToMaps(data)
 	}
 
-	b := &bulkCreateBuilder{
+	b := &createRecordsBuilder{
 		table:    t,
 		data:     dataMaps,
 		chainErr: err,
@@ -98,7 +98,7 @@ func (t *Table) BulkCreateRecords(data any) *bulkCreateBuilder {
 
 // Execute performs the bulk create operation with the configured parameters.
 // Returns a slice of IDs for the created records or an error if the operation fails.
-func (b *bulkCreateBuilder) Execute() ([]int, error) {
+func (b *createRecordsBuilder) Execute() ([]int, error) {
 	if b.chainErr != nil {
 		return nil, fmt.Errorf("error in the chain of methods: %w", b.chainErr)
 	}

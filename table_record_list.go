@@ -107,8 +107,7 @@ func (r ListResponse) DecodeInto(dest any) error {
 	return decodeInto(r.List, dest)
 }
 
-// Execute performs the list operation with the configured parameters.
-// Returns a ListResponse containing the records and pagination information, or an error if the operation fails.
+// Execute finalizes and executes the operation.
 func (b *listRecordsBuilder) Execute() (ListResponse, error) {
 	query := url.Values{}
 	query = b.filterProvider.apply(query)

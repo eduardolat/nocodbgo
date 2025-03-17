@@ -40,8 +40,7 @@ func (t *Table) CreateRecord(data any) *createRecordBuilder {
 	return b
 }
 
-// Execute performs the create operation with the configured parameters.
-// Returns the ID of the created record or an error if the operation fails.
+// Execute finalizes and executes the operation.
 func (b *createRecordBuilder) Execute() (int, error) {
 	if b.chainErr != nil {
 		return 0, fmt.Errorf("error in the chain of methods: %w", b.chainErr)
@@ -96,8 +95,7 @@ func (t *Table) CreateRecords(data any) *createRecordsBuilder {
 	return b
 }
 
-// Execute performs the bulk create operation with the configured parameters.
-// Returns a slice of IDs for the created records or an error if the operation fails.
+// Execute finalizes and executes the operation.
 func (b *createRecordsBuilder) Execute() ([]int, error) {
 	if b.chainErr != nil {
 		return nil, fmt.Errorf("error in the chain of methods: %w", b.chainErr)

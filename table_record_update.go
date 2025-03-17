@@ -41,8 +41,7 @@ func (t *Table) UpdateRecord(recordID int, data any) *updateRecordBuilder {
 	return b
 }
 
-// Execute performs the update operation with the configured parameters.
-// Returns an error if the operation fails.
+// Execute finalizes and executes the operation.
 func (b *updateRecordBuilder) Execute() error {
 	if b.recordID == 0 {
 		return ErrRowIDRequired
@@ -106,8 +105,7 @@ func (t *Table) UpdateRecords(data any) *updateRecordsBuilder {
 	return b
 }
 
-// Execute performs the bulk update operation with the configured parameters.
-// Returns an error if the operation fails.
+// Execute finalizes and executes the operation.
 func (b *updateRecordsBuilder) Execute() error {
 	if b.chainErr != nil {
 		return fmt.Errorf("error in the chain of methods: %w", b.chainErr)

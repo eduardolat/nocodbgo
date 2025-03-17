@@ -27,8 +27,7 @@ func (t *Table) DeleteRecord(recordID int) *deleteRecordBuilder {
 	return b
 }
 
-// Execute performs the delete operation with the configured parameters.
-// Returns an error if the operation fails.
+// Execute finalizes and executes the operation.
 func (b *deleteRecordBuilder) Execute() error {
 	if b.recordID == 0 {
 		return ErrRowIDRequired
@@ -67,9 +66,7 @@ func (t *Table) DeleteRecords(recordIDs []int) *deleteRecordsBuilder {
 	return b
 }
 
-// Execute performs the bulk delete operation with the configured parameters.
-// If no record IDs are provided, the method returns without an error.
-// Returns an error if the operation fails.
+// Execute finalizes and executes the operation.
 func (b *deleteRecordsBuilder) Execute() error {
 	if len(b.recordIDs) == 0 {
 		return nil

@@ -30,8 +30,7 @@ func (t *Table) CountRecords() *countRecordsBuilder {
 	return b
 }
 
-// Execute performs the count operation with the configured parameters.
-// Returns the number of records that match the filters or an error if the operation fails.
+// Execute finalizes and executes the operation.
 func (b *countRecordsBuilder) Execute() (int, error) {
 	query := url.Values{}
 	query = b.filterProvider.apply(query)

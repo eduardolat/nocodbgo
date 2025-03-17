@@ -44,8 +44,7 @@ func (r ReadResponse) DecodeInto(dest any) error {
 	return decodeInto(r.Data, dest)
 }
 
-// Execute performs the read operation with the configured parameters.
-// Returns a ReadResponse containing the record data or an error if the operation fails.
+// Execute finalizes and executes the operation.
 func (b *readRecordBuilder) Execute() (ReadResponse, error) {
 	if b.recordID == 0 {
 		return ReadResponse{}, ErrRowIDRequired

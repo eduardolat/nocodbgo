@@ -51,19 +51,21 @@ them.
 ### Creating a client
 
 ```go
+package main
+
 import (
-    "github.com/eduardolat/nocodbgo"
-    "time"
+	"github.com/eduardolat/nocodbgo"
 )
 
-// Create a new client using the chain pattern
-client, err := nocodbgo.NewClient().
-    WithBaseURL("https://example.com").
-    WithAPIToken("your-api-token").
-    WithHTTPTimeout(30*time.Second).
-    Create()
-if err != nil {
-    // Handle error
+func main() {
+	// Create a new client using the chain pattern
+	client, err := nocodbgo.NewClient().
+		WithBaseURL("https://example.com").
+		WithAPIToken("your-api-token").
+		Create()
+	if err != nil {
+		// Handle error
+	}
 }
 ```
 

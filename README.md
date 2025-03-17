@@ -25,7 +25,7 @@ using a fluent chain pattern.
 
 > [!WARNING]
 > This client is not yet stable and the API signature may change in the future
-> until it reaches version 1.0.0 so be careful when upgrading. Howeever, the API
+> until it reaches version 1.0.0, so be careful when upgrading. However, the API
 > signature should not change too much.
 
 ## Installation
@@ -37,6 +37,16 @@ go get github.com/eduardolat/nocodbgo
 ```
 
 ## Usage
+
+Most modern code editors will provide autocompletion to guide you through the
+available options as you type. This makes using the SDK intuitive and easy to
+learn.
+
+You can find examples of how to use the client in the [examples](examples)
+directory.
+
+You can also hover over the methods provided by the client to read more about
+them.
 
 ### Creating a client
 
@@ -57,34 +67,28 @@ if err != nil {
 }
 ```
 
-### Working with tables
+### Basic CRUD Operations
 
 ```go
 // Get a table
 table := client.Table("your-table-id")
 
-// Create a record, this can be a map[string]any or a struct with JSON tags
+// Create a record (can be a map[string]any or a struct with JSON tags)
 user := map[string]any{
     "Name": "John Doe",
     "Email": "john@example.com",
     "Age": 30,
 }
 
-userID, err := table.CreateRecord(user).
-    WithContext(context.Background()).
-    Execute()
-if err != nil {
-    // Handle error
-}
+// Create a record
+userID, err := table.CreateRecord(user).Execute()
 
 // Read a record
 readResponse, err := table.ReadRecord(userID).
-    WithContext(context.Background()).
+    // Optional, if not provided a context.Background() will be used
+    WithContext(context.Background()). 
     ReturnFields("Name", "Email", "Age").
     Execute()
-if err != nil {
-    // Handle error
-}
 
 // Decode into a struct
 type User struct {
@@ -96,84 +100,64 @@ type User struct {
 
 var userStruct User
 err = readResponse.DecodeInto(&userStruct)
-if err != nil {
-    // Handle error
-}
 
 // Update a record
 updateUser := map[string]any{
+    "Id": userID,  // ID must be included
     "Name": "John Smith",
 }
 
-err = table.UpdateRecord(userID, updateUser).
-    WithContext(context.Background()).
-    Execute()
-if err != nil {
-    // Handle error
-}
+err = table.UpdateRecord(updateUser).Execute()
 
 // Delete a record
-err = table.DeleteRecord(userID).
-    WithContext(context.Background()).
-    Execute()
-if err != nil {
-    // Handle error
-}
+err = table.DeleteRecord(userID).Execute()
 ```
 
-### Listing and filtering
+### Listing and Filtering Records
 
 ```go
 // List records with options using the chain pattern
 result, err := table.ListRecords().
-    WithContext(context.Background()).
-    FilterGreaterThan("Age", "18").
+    Where("(Age,gt,18)").
     SortAscBy("Name").
     Limit(10).
     Execute()
-if err != nil {
-    // Handle error
-}
 
 // Decode the list into a struct
 var users []User
 err = result.DecodeInto(&users)
-if err != nil {
-    // Handle error
-}
 
 // Count records
 count, err := table.CountRecords().
-    WithContext(context.Background()).
-    FilterGreaterThan("Age", "18").
+    Where("(Age,gt,18)").
     Execute()
-if err != nil {
-    // Handle error
-}
 ```
 
-### Complex filters
+### Complex Filters
 
 ```go
-// Query with complex filters
+// Query with complex filters using specific methods
 result, err := table.ListRecords().
-    WithContext(context.Background()).
-    FilterEqualTo("Name", "John Smith").
-    FilterGreaterThan("Age", "18").
-    FilterLessThan("Age", "30").
+    WhereIsEqualTo("Name", "John Smith").
+    WhereIsGreaterThan("Age", "18").
+    WhereIsLessThan("Age", "30").
     SortAscBy("Name").
     Limit(10).
     Execute()
-if err != nil {
-    // Handle error
-}
+
+// Query with custom filters
+result, err := table.ListRecords().
+    Where("(Age,gt,20)~or(Email,like,%@example.com)").
+    SortDescBy("Age").
+    Limit(5).
+    Execute()
 ```
 
-### Bulk operations
+### Operations with Multiple Records
 
 ```go
-// Bulk create records
-bulkUsers := []map[string]any{
+// Create multiple records
+users := []map[string]any{
     {
         "Name": "Jane Doe",
         "Email": "jane@example.com",
@@ -186,79 +170,90 @@ bulkUsers := []map[string]any{
     },
 }
 
-createdUsers, err := table.BulkCreateRecords(bulkUsers).
-    WithContext(context.Background()).
-    Execute()
-if err != nil {
-    // Handle error
-}
+createdIDs, err := table.CreateRecords(users).Execute()
 
-// Bulk update records
-bulkUpdateUsers := []map[string]any{
+// Update multiple records
+updateUsers := []map[string]any{
     {
-        "Id": createdUsers[0],
+        "Id": createdIDs[0],
         "Name": "Jane Smith",
     },
     {
-        "Id": createdUsers[1],
+        "Id": createdIDs[1],
         "Name": "Robert Smith",
     },
 }
 
-err = table.BulkUpdateRecords(bulkUpdateUsers).
-    WithContext(context.Background()).
-    Execute()
-if err != nil {
-    // Handle error
-}
+err = table.UpdateRecords(updateUsers).Execute()
 
-// Bulk delete records
-err = table.BulkDeleteRecords(createdUsers).
-    WithContext(context.Background()).
-    Execute()
-if err != nil {
-    // Handle error
-}
+// Delete multiple records
+err = table.DeleteRecords(createdIDs).Execute()
 ```
 
-### Working with linked records
+### Working with Linked Records
 
 ```go
 // List linked records
-linkedRecords, err := table.ListLinkedRecords("link-field-id", recordID).
-    WithContext(context.Background()).
+linkedRecords, err := table.ListLinks("link-field-id", recordID).
     ReturnFields("Name", "Email").
     SortAscBy("Name").
     Limit(10).
-    FilterGreaterThan("Age", "18").
+    Where("(Age,gt,18)").
     Execute()
-if err != nil {
-    // Handle error
-}
 
-// Decode the linked records into a struct
+// Decode the linked records
 var linkedUsers []User
 err = linkedRecords.DecodeInto(&linkedUsers)
-if err != nil {
-    // Handle error
-}
 
-// Link records
-err = table.LinkRecords("link-field-id", recordID, []int{1, 2, 3}).
-    WithContext(context.Background()).
-    Execute()
-if err != nil {
-    // Handle error
-}
+// Create a link
+err = table.CreateLink("link-field-id", recordID, targetID).Execute()
 
-// Unlink records
-err = table.UnlinkRecords("link-field-id", recordID, []int{1, 2}).
-    WithContext(context.Background()).
-    Execute()
-if err != nil {
-    // Handle error
-}
+// Create multiple links
+err = table.CreateLinks("link-field-id", recordID, []int{1, 2, 3}).Execute()
+
+// Delete a link
+err = table.DeleteLink("link-field-id", recordID, targetID).Execute()
+
+// Delete multiple links
+err = table.DeleteLinks("link-field-id", recordID, []int{1, 2}).Execute()
 ```
+
+### Additional Options
+
+```go
+// Use a specific view
+result, err := table.ListRecords().
+    WithViewId("view-id").
+    Execute()
+
+// Shuffle results randomly
+result, err := table.ListRecords().
+    Shuffle().
+    Limit(5).
+    Execute()
+
+// Pagination
+result, err := table.ListRecords().
+    Page(2, 10). // Page 2, 10 records per page
+    Execute()
+```
+
+## Context Control
+
+All operations support the use of `context.Context` for cancellation and timeout
+control:
+
+```go
+ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+defer cancel()
+
+result, err := table.ListRecords().
+    WithContext(ctx).
+    Where("(Age,gt,18)").
+    Execute()
+```
+
+If you don't provide a context, a context.Background() will be used.
 
 ## License
 

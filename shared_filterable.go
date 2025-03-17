@@ -5,21 +5,21 @@ import (
 	"strings"
 )
 
-// Filters provides a reusable set of filter methods for building query filters.
+// Filters provides a reusable set of filter methods for building query filterable.
 // It is designed to be embedded in builder types to provide consistent filtering capabilities.
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-type filters[T any] struct {
+type filterable[T any] struct {
 	builder    T
 	rawFilters []string
 }
 
 // newFilters creates a new Filters instance with the given builder and apply function.
 // The apply function is used to add a filter to the builder and return the builder for chaining.
-func newFilters[T any](builder T) filters[T] {
-	return filters[T]{
+func newFilters[T any](builder T) filterable[T] {
+	return filterable[T]{
 		builder:    builder,
 		rawFilters: []string{},
 	}
@@ -36,7 +36,7 @@ func newFilters[T any](builder T) filters[T] {
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#logical-operators
-func (f *filters[T]) Where(filter string) T {
+func (f *filterable[T]) Where(filter string) T {
 	if filter != "" {
 		f.rawFilters = append(f.rawFilters, filter)
 	}
@@ -54,7 +54,7 @@ func (f *filters[T]) Where(filter string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsEqualTo(column string, value string) T {
+func (f *filterable[T]) WhereIsEqualTo(column string, value string) T {
 	filter := fmt.Sprintf("(%s,eq,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -71,7 +71,7 @@ func (f *filters[T]) WhereIsEqualTo(column string, value string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsNotEqualTo(column string, value string) T {
+func (f *filterable[T]) WhereIsNotEqualTo(column string, value string) T {
 	filter := fmt.Sprintf("(%s,neq,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -88,7 +88,7 @@ func (f *filters[T]) WhereIsNotEqualTo(column string, value string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsGreaterThan(column string, value string) T {
+func (f *filterable[T]) WhereIsGreaterThan(column string, value string) T {
 	filter := fmt.Sprintf("(%s,gt,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -105,7 +105,7 @@ func (f *filters[T]) WhereIsGreaterThan(column string, value string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsGreaterThanOrEqual(column string, value string) T {
+func (f *filterable[T]) WhereIsGreaterThanOrEqual(column string, value string) T {
 	filter := fmt.Sprintf("(%s,ge,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -122,7 +122,7 @@ func (f *filters[T]) WhereIsGreaterThanOrEqual(column string, value string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsLessThan(column string, value string) T {
+func (f *filterable[T]) WhereIsLessThan(column string, value string) T {
 	filter := fmt.Sprintf("(%s,lt,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -139,7 +139,7 @@ func (f *filters[T]) WhereIsLessThan(column string, value string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsLessThanOrEqual(column string, value string) T {
+func (f *filterable[T]) WhereIsLessThanOrEqual(column string, value string) T {
 	filter := fmt.Sprintf("(%s,le,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -156,7 +156,7 @@ func (f *filters[T]) WhereIsLessThanOrEqual(column string, value string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsNull(column string) T {
+func (f *filterable[T]) WhereIsNull(column string) T {
 	filter := fmt.Sprintf("(%s,is,null)", column)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -173,7 +173,7 @@ func (f *filters[T]) WhereIsNull(column string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsNotNull(column string) T {
+func (f *filterable[T]) WhereIsNotNull(column string) T {
 	filter := fmt.Sprintf("(%s,isnot,null)", column)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -190,7 +190,7 @@ func (f *filters[T]) WhereIsNotNull(column string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsTrue(column string) T {
+func (f *filterable[T]) WhereIsTrue(column string) T {
 	filter := fmt.Sprintf("(%s,is,true)", column)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -207,7 +207,7 @@ func (f *filters[T]) WhereIsTrue(column string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsFalse(column string) T {
+func (f *filterable[T]) WhereIsFalse(column string) T {
 	filter := fmt.Sprintf("(%s,is,false)", column)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -224,7 +224,7 @@ func (f *filters[T]) WhereIsFalse(column string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsIn(column string, values ...string) T {
+func (f *filterable[T]) WhereIsIn(column string, values ...string) T {
 	if len(values) == 0 {
 		return f.builder
 	}
@@ -245,7 +245,7 @@ func (f *filters[T]) WhereIsIn(column string, values ...string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsBetween(column string, min, max string) T {
+func (f *filterable[T]) WhereIsBetween(column string, min, max string) T {
 	filter := fmt.Sprintf("(%s,btw,%s,%s)", column, min, max)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -262,7 +262,7 @@ func (f *filters[T]) WhereIsBetween(column string, min, max string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsNotBetween(column string, min, max string) T {
+func (f *filterable[T]) WhereIsNotBetween(column string, min, max string) T {
 	filter := fmt.Sprintf("(%s,nbtw,%s,%s)", column, min, max)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -282,7 +282,7 @@ func (f *filters[T]) WhereIsNotBetween(column string, min, max string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsLike(column string, value string) T {
+func (f *filterable[T]) WhereIsLike(column string, value string) T {
 	filter := fmt.Sprintf("(%s,like,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -302,7 +302,7 @@ func (f *filters[T]) WhereIsLike(column string, value string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsNotLike(column string, value string) T {
+func (f *filterable[T]) WhereIsNotLike(column string, value string) T {
 	filter := fmt.Sprintf("(%s,nlike,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -324,7 +324,7 @@ func (f *filters[T]) WhereIsNotLike(column string, value string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsWithin(column string, subOperation string) T {
+func (f *filterable[T]) WhereIsWithin(column string, subOperation string) T {
 	filter := fmt.Sprintf("(%s,within,%s)", column, subOperation)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -342,7 +342,7 @@ func (f *filters[T]) WhereIsWithin(column string, subOperation string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsAllOf(column string, values ...string) T {
+func (f *filterable[T]) WhereIsAllOf(column string, values ...string) T {
 	if len(values) == 0 {
 		return f.builder
 	}
@@ -364,7 +364,7 @@ func (f *filters[T]) WhereIsAllOf(column string, values ...string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsAnyOf(column string, values ...string) T {
+func (f *filterable[T]) WhereIsAnyOf(column string, values ...string) T {
 	if len(values) == 0 {
 		return f.builder
 	}
@@ -386,7 +386,7 @@ func (f *filters[T]) WhereIsAnyOf(column string, values ...string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsNotAllOf(column string, values ...string) T {
+func (f *filterable[T]) WhereIsNotAllOf(column string, values ...string) T {
 	if len(values) == 0 {
 		return f.builder
 	}
@@ -408,7 +408,7 @@ func (f *filters[T]) WhereIsNotAllOf(column string, values ...string) T {
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereIsNotAnyOf(column string, values ...string) T {
+func (f *filterable[T]) WhereIsNotAnyOf(column string, values ...string) T {
 	if len(values) == 0 {
 		return f.builder
 	}

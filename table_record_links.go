@@ -13,11 +13,11 @@ type linkedRecordsListBuilder struct {
 	linkFieldID string
 	recordID    int
 
-	contextable[*linkedRecordsListBuilder]
-	filterable[*linkedRecordsListBuilder]
-	sortable[*linkedRecordsListBuilder]
-	pageable[*linkedRecordsListBuilder]
-	fieldable[*linkedRecordsListBuilder]
+	contextProvider[*linkedRecordsListBuilder]
+	filterProvider[*linkedRecordsListBuilder]
+	sortProvider[*linkedRecordsListBuilder]
+	paginationProvider[*linkedRecordsListBuilder]
+	fieldProvider[*linkedRecordsListBuilder]
 }
 
 // ListLinkedRecords initiates the construction of a query to list linked records for a specific link field and record ID.
@@ -30,11 +30,11 @@ func (t *Table) ListLinkedRecords(linkFieldID string, recordID int) *linkedRecor
 		recordID:    recordID,
 	}
 
-	b.contextable = newContextable(b)
-	b.filterable = newFilterable(b)
-	b.sortable = newSortable(b)
-	b.pageable = newPageable(b)
-	b.fieldable = newFieldable(b)
+	b.contextProvider = newContextProvider(b)
+	b.filterProvider = newFilterProvider(b)
+	b.sortProvider = newSortProvider(b)
+	b.paginationProvider = newPaginationProvider(b)
+	b.fieldProvider = newFieldProvider(b)
 
 	return b
 }
@@ -51,13 +51,13 @@ func (b *linkedRecordsListBuilder) Execute() (ListResponse, error) {
 	}
 
 	query := url.Values{}
-	query = b.filterable.apply(query)
-	query = b.sortable.apply(query)
-	query = b.pageable.apply(query)
-	query = b.fieldable.apply(query)
+	query = b.filterProvider.apply(query)
+	query = b.sortProvider.apply(query)
+	query = b.paginationProvider.apply(query)
+	query = b.fieldProvider.apply(query)
 
 	path := fmt.Sprintf("/api/v2/tables/%s/links/%s/records/%d", b.table.tableID, b.linkFieldID, b.recordID)
-	respBody, err := b.table.client.request(b.contextable.ctx, http.MethodGet, path, nil, query)
+	respBody, err := b.table.client.request(b.contextProvider.ctx, http.MethodGet, path, nil, query)
 	if err != nil {
 		return ListResponse{}, fmt.Errorf("failed to list linked records: %w", err)
 	}
@@ -77,7 +77,7 @@ type linkRecordsBuilder struct {
 	recordID    int
 	recordIDs   []int
 
-	contextable[*linkRecordsBuilder]
+	contextProvider[*linkRecordsBuilder]
 }
 
 // LinkRecords initiates the construction of an operation to link records to a specific link field and record ID.
@@ -91,7 +91,7 @@ func (t *Table) LinkRecords(linkFieldID string, recordID int, recordIDs []int) *
 		recordIDs:   recordIDs,
 	}
 
-	b.contextable = newContextable(b)
+	b.contextProvider = newContextProvider(b)
 
 	return b
 }
@@ -118,7 +118,7 @@ func (b *linkRecordsBuilder) Execute() error {
 	}
 
 	path := fmt.Sprintf("/api/v2/tables/%s/links/%s/records/%d", b.table.tableID, b.linkFieldID, b.recordID)
-	_, err := b.table.client.request(b.contextable.ctx, http.MethodPost, path, ids, nil)
+	_, err := b.table.client.request(b.contextProvider.ctx, http.MethodPost, path, ids, nil)
 	if err != nil {
 		return fmt.Errorf("failed to link records: %w", err)
 	}
@@ -133,7 +133,7 @@ type unlinkRecordsBuilder struct {
 	recordID    int
 	recordIDs   []int
 
-	contextable[*unlinkRecordsBuilder]
+	contextProvider[*unlinkRecordsBuilder]
 }
 
 // UnlinkRecords initiates the construction of an operation to unlink records from a specific link field and record ID.
@@ -147,7 +147,7 @@ func (t *Table) UnlinkRecords(linkFieldID string, recordID int, recordIDs []int)
 		recordIDs:   recordIDs,
 	}
 
-	b.contextable = newContextable(b)
+	b.contextProvider = newContextProvider(b)
 
 	return b
 }
@@ -174,7 +174,7 @@ func (b *unlinkRecordsBuilder) Execute() error {
 	}
 
 	path := fmt.Sprintf("/api/v2/tables/%s/links/%s/records/%d", b.table.tableID, b.linkFieldID, b.recordID)
-	_, err := b.table.client.request(b.contextable.ctx, http.MethodDelete, path, ids, nil)
+	_, err := b.table.client.request(b.contextProvider.ctx, http.MethodDelete, path, ids, nil)
 	if err != nil {
 		return fmt.Errorf("failed to unlink records: %w", err)
 	}

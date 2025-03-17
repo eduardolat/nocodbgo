@@ -5,32 +5,32 @@ import (
 	"strings"
 )
 
-// fieldable provides a reusable set of methods for building query with support for specifying
+// fieldProvider provides a reusable set of methods for building query with support for specifying
 // fields to return from the query using the "fields" query parameter.
 //
 // It is designed to be embedded in builder types to provide consistent field selection capabilities.
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
-type fieldable[T any] struct {
+type fieldProvider[T any] struct {
 	builder   T
 	rawFields []string
 }
 
-// newFieldable creates a new fieldable instance with the given builder and apply function.
+// newFieldProvider creates a new fieldProvider instance with the given builder and apply function.
 // The apply function is used to add a field to the builder and return the builder for chaining.
-func newFieldable[T any](builder T) fieldable[T] {
-	return fieldable[T]{
+func newFieldProvider[T any](builder T) fieldProvider[T] {
+	return fieldProvider[T]{
 		builder:   builder,
 		rawFields: []string{},
 	}
 }
 
 // apply takes the url.Values and adds the "fields" query parameter to it with all the fields
-// that have been added to the fieldable instance.
+// that have been added to the fieldProvider instance.
 //
 // It returns a new copy of the provided url.Values with the "fields" query parameter added.
-func (f *fieldable[T]) apply(query url.Values) url.Values {
+func (f *fieldProvider[T]) apply(query url.Values) url.Values {
 	if query == nil || len(f.rawFields) < 1 {
 		return query
 	}
@@ -50,7 +50,7 @@ func (f *fieldable[T]) apply(query url.Values) url.Values {
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
-func (f *fieldable[T]) ReturnFields(fields ...string) T {
+func (f *fieldProvider[T]) ReturnFields(fields ...string) T {
 	f.rawFields = fields
 	return f.builder
 }

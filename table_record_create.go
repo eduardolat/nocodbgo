@@ -12,7 +12,7 @@ type createBuilder struct {
 	data     map[string]any
 	chainErr error // Stores any error in the chain of methods
 
-	contextable[*createBuilder]
+	contextProvider[*createBuilder]
 }
 
 // CreateRecord initiates the construction of a create operation for a single record.
@@ -35,7 +35,7 @@ func (t *Table) CreateRecord(data any) *createBuilder {
 		chainErr: err,
 	}
 
-	b.contextable = newContextable(b)
+	b.contextProvider = newContextProvider(b)
 
 	return b
 }
@@ -49,7 +49,7 @@ func (b *createBuilder) Execute() (int, error) {
 
 	records, err := b.table.
 		BulkCreateRecords([]map[string]any{b.data}).
-		WithContext(b.contextable.ctx).
+		WithContext(b.contextProvider.ctx).
 		Execute()
 	if err != nil {
 		return 0, fmt.Errorf("failed to create record: %w", err)
@@ -68,7 +68,7 @@ type bulkCreateBuilder struct {
 	data     []map[string]any
 	chainErr error // Stores any error in the chain of methods
 
-	contextable[*bulkCreateBuilder]
+	contextProvider[*bulkCreateBuilder]
 }
 
 // BulkCreateRecords initiates the construction of a bulk create operation for multiple records.
@@ -91,7 +91,7 @@ func (t *Table) BulkCreateRecords(data any) *bulkCreateBuilder {
 		chainErr: err,
 	}
 
-	b.contextable = newContextable(b)
+	b.contextProvider = newContextProvider(b)
 
 	return b
 }
@@ -104,7 +104,7 @@ func (b *bulkCreateBuilder) Execute() ([]int, error) {
 	}
 
 	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)
-	respBody, err := b.table.client.request(b.contextable.ctx, http.MethodPost, path, b.data, nil)
+	respBody, err := b.table.client.request(b.contextProvider.ctx, http.MethodPost, path, b.data, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create records: %w", err)
 	}

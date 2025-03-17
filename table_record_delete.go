@@ -10,7 +10,7 @@ type deleteBuilder struct {
 	table    *Table
 	recordID int
 
-	contextable[*deleteBuilder]
+	contextProvider[*deleteBuilder]
 }
 
 // DeleteRecord initiates the construction of a delete operation for a single record.
@@ -22,7 +22,7 @@ func (t *Table) DeleteRecord(recordID int) *deleteBuilder {
 		recordID: recordID,
 	}
 
-	b.contextable = newContextable(b)
+	b.contextProvider = newContextProvider(b)
 
 	return b
 }
@@ -36,7 +36,7 @@ func (b *deleteBuilder) Execute() error {
 
 	err := b.table.
 		BulkDeleteRecords([]int{b.recordID}).
-		WithContext(b.contextable.ctx).
+		WithContext(b.contextProvider.ctx).
 		Execute()
 	if err != nil {
 		return fmt.Errorf("failed to delete record: %w", err)
@@ -50,7 +50,7 @@ type bulkDeleteBuilder struct {
 	table     *Table
 	recordIDs []int
 
-	contextable[*bulkDeleteBuilder]
+	contextProvider[*bulkDeleteBuilder]
 }
 
 // BulkDeleteRecords initiates the construction of a bulk delete operation for multiple records.
@@ -62,7 +62,7 @@ func (t *Table) BulkDeleteRecords(recordIDs []int) *bulkDeleteBuilder {
 		recordIDs: recordIDs,
 	}
 
-	b.contextable = newContextable(b)
+	b.contextProvider = newContextProvider(b)
 
 	return b
 }
@@ -82,7 +82,7 @@ func (b *bulkDeleteBuilder) Execute() error {
 	}
 
 	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)
-	_, err := b.table.client.request(b.contextable.ctx, http.MethodDelete, path, ids, nil)
+	_, err := b.table.client.request(b.contextProvider.ctx, http.MethodDelete, path, ids, nil)
 	if err != nil {
 		return fmt.Errorf("failed to delete records: %w", err)
 	}

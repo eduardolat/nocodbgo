@@ -2,16 +2,16 @@ package nocodbgo
 
 import "context"
 
-// contextable is a helper struct that contains a context.Context and it's intended
+// contextProvider is a helper struct that contains a context.Context and it's intended
 // to be embedded in builder types to provide a context for the request.
-type contextable[T any] struct {
+type contextProvider[T any] struct {
 	builder T
 	ctx     context.Context
 }
 
-// newContextable creates a new contextable instance with the given builder.
-func newContextable[T any](builder T) contextable[T] {
-	return contextable[T]{
+// newContextProvider creates a new contextProvider instance with the given builder.
+func newContextProvider[T any](builder T) contextProvider[T] {
+	return contextProvider[T]{
 		builder: builder,
 		ctx:     context.Background(),
 	}
@@ -22,7 +22,7 @@ func newContextable[T any](builder T) contextable[T] {
 // This allows for request cancellation and timeout control.
 //
 // If not set, the context will default to context.Background().
-func (c *contextable[T]) WithContext(ctx context.Context) T {
+func (c *contextProvider[T]) WithContext(ctx context.Context) T {
 	c.ctx = ctx
 	return c.builder
 }

@@ -11,13 +11,13 @@ import (
 type listBuilder struct {
 	table *Table
 
-	contextable[*listBuilder]
-	filterable[*listBuilder]
-	sortable[*listBuilder]
-	pageable[*listBuilder]
-	fieldable[*listBuilder]
-	shuffleable[*listBuilder]
-	viewSelectable[*listBuilder]
+	contextProvider[*listBuilder]
+	filterProvider[*listBuilder]
+	sortProvider[*listBuilder]
+	paginationProvider[*listBuilder]
+	fieldProvider[*listBuilder]
+	shuffleProvider[*listBuilder]
+	viewIDProvider[*listBuilder]
 }
 
 // ListRecords initiates the construction of a query to list records from a table.
@@ -27,13 +27,13 @@ func (t *Table) ListRecords() *listBuilder {
 		table: t,
 	}
 
-	b.contextable = newContextable(b)
-	b.filterable = newFilterable(b)
-	b.sortable = newSortable(b)
-	b.pageable = newPageable(b)
-	b.fieldable = newFieldable(b)
-	b.shuffleable = newShuffleable(b)
-	b.viewSelectable = newViewSelectable(b)
+	b.contextProvider = newContextProvider(b)
+	b.filterProvider = newFilterProvider(b)
+	b.sortProvider = newSortProvider(b)
+	b.paginationProvider = newPaginationProvider(b)
+	b.fieldProvider = newFieldProvider(b)
+	b.shuffleProvider = newShuffleProvider(b)
+	b.viewIDProvider = newViewIDProvider(b)
 
 	return b
 }
@@ -111,15 +111,15 @@ func (r ListResponse) DecodeInto(dest any) error {
 // Returns a ListResponse containing the records and pagination information, or an error if the operation fails.
 func (b *listBuilder) Execute() (ListResponse, error) {
 	query := url.Values{}
-	query = b.filterable.apply(query)
-	query = b.sortable.apply(query)
-	query = b.pageable.apply(query)
-	query = b.fieldable.apply(query)
-	query = b.shuffleable.apply(query)
-	query = b.viewSelectable.apply(query)
+	query = b.filterProvider.apply(query)
+	query = b.sortProvider.apply(query)
+	query = b.paginationProvider.apply(query)
+	query = b.fieldProvider.apply(query)
+	query = b.shuffleProvider.apply(query)
+	query = b.viewIDProvider.apply(query)
 
 	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)
-	respBody, err := b.table.client.request(b.contextable.ctx, http.MethodGet, path, nil, query)
+	respBody, err := b.table.client.request(b.contextProvider.ctx, http.MethodGet, path, nil, query)
 	if err != nil {
 		return ListResponse{}, fmt.Errorf("failed to list records: %w", err)
 	}

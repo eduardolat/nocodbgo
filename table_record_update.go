@@ -12,7 +12,7 @@ type updateBuilder struct {
 	data     map[string]any
 	chainErr error // Stores any error in the chain of methods
 
-	contextable[*updateBuilder]
+	contextProvider[*updateBuilder]
 }
 
 // UpdateRecord initiates the construction of an update query for a single record.
@@ -36,7 +36,7 @@ func (t *Table) UpdateRecord(recordID int, data any) *updateBuilder {
 		chainErr: err,
 	}
 
-	b.contextable = newContextable(b)
+	b.contextProvider = newContextProvider(b)
 
 	return b
 }
@@ -61,7 +61,7 @@ func (b *updateBuilder) Execute() error {
 
 	err := b.table.
 		BulkUpdateRecords([]map[string]any{updateData}).
-		WithContext(b.contextable.ctx).
+		WithContext(b.contextProvider.ctx).
 		Execute()
 	if err != nil {
 		return fmt.Errorf("failed to update record: %w", err)
@@ -76,7 +76,7 @@ type bulkUpdateBuilder struct {
 	data     []map[string]any
 	chainErr error // Stores any error in the chain of methods
 
-	contextable[*bulkUpdateBuilder]
+	contextProvider[*bulkUpdateBuilder]
 }
 
 // BulkUpdateRecords initiates the construction of a bulk update query for multiple records.
@@ -100,7 +100,7 @@ func (t *Table) BulkUpdateRecords(data any) *bulkUpdateBuilder {
 		chainErr: err,
 	}
 
-	b.contextable = newContextable(b)
+	b.contextProvider = newContextProvider(b)
 
 	return b
 }
@@ -113,7 +113,7 @@ func (b *bulkUpdateBuilder) Execute() error {
 	}
 
 	path := fmt.Sprintf("/api/v2/tables/%s/records", b.table.tableID)
-	_, err := b.table.client.request(b.contextable.ctx, http.MethodPatch, path, b.data, nil)
+	_, err := b.table.client.request(b.contextProvider.ctx, http.MethodPatch, path, b.data, nil)
 	if err != nil {
 		return fmt.Errorf("failed to update records: %w", err)
 	}

@@ -11,9 +11,9 @@ import (
 type countBuilder struct {
 	table *Table
 
-	contextable[*countBuilder]
-	filterable[*countBuilder]
-	viewSelectable[*countBuilder]
+	contextProvider[*countBuilder]
+	filterProvider[*countBuilder]
+	viewIDProvider[*countBuilder]
 }
 
 // CountRecords initiates the construction of a query to count records in a table.
@@ -23,9 +23,9 @@ func (t *Table) CountRecords() *countBuilder {
 		table: t,
 	}
 
-	b.contextable = newContextable(b)
-	b.filterable = newFilterable(b)
-	b.viewSelectable = newViewSelectable(b)
+	b.contextProvider = newContextProvider(b)
+	b.filterProvider = newFilterProvider(b)
+	b.viewIDProvider = newViewIDProvider(b)
 
 	return b
 }
@@ -34,11 +34,11 @@ func (t *Table) CountRecords() *countBuilder {
 // Returns the number of records that match the filters or an error if the operation fails.
 func (b *countBuilder) Execute() (int, error) {
 	query := url.Values{}
-	query = b.filterable.apply(query)
-	query = b.viewSelectable.apply(query)
+	query = b.filterProvider.apply(query)
+	query = b.viewIDProvider.apply(query)
 
 	path := fmt.Sprintf("/api/v2/tables/%s/records/count", b.table.tableID)
-	respBody, err := b.table.client.request(b.contextable.ctx, http.MethodGet, path, nil, query)
+	respBody, err := b.table.client.request(b.contextProvider.ctx, http.MethodGet, path, nil, query)
 	if err != nil {
 		return 0, fmt.Errorf("failed to count records: %w", err)
 	}

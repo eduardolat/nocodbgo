@@ -2,30 +2,30 @@ package nocodbgo
 
 import "net/url"
 
-// viewSelectable provides a reusable set of methods for building query with support for view selection
+// viewIDProvider provides a reusable set of methods for building query with support for view selection
 // using the "viewId" query parameter.
 //
 // It is designed to be embedded in builder types to provide consistent view selection capabilities.
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
-type viewSelectable[T any] struct {
+type viewIDProvider[T any] struct {
 	builder   T
 	rawViewID string
 }
 
-// newViewSelectable creates a new viewSelectable instance with the given builder.
-func newViewSelectable[T any](builder T) viewSelectable[T] {
-	return viewSelectable[T]{
+// newViewIDProvider creates a new viewIDProvider instance with the given builder.
+func newViewIDProvider[T any](builder T) viewIDProvider[T] {
+	return viewIDProvider[T]{
 		builder: builder,
 	}
 }
 
 // apply takes the url.Values and adds the "viewId" query parameter to it with the value
-// that has been set on the viewSelectable instance.
+// that has been set on the viewIDProvider instance.
 //
 // It returns a new copy of the provided url.Values with the "viewId" query parameter added.
-func (v *viewSelectable[T]) apply(query url.Values) url.Values {
+func (v *viewIDProvider[T]) apply(query url.Values) url.Values {
 	if query == nil || v.rawViewID == "" {
 		return query
 	}
@@ -50,7 +50,7 @@ func (v *viewSelectable[T]) apply(query url.Values) url.Values {
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
-func (v *viewSelectable[T]) WithViewId(viewId string) T {
+func (v *viewIDProvider[T]) WithViewId(viewId string) T {
 	if viewId != "" {
 		v.rawViewID = viewId
 	}

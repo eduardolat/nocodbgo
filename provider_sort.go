@@ -5,32 +5,32 @@ import (
 	"strings"
 )
 
-// sortable provides a reusable set of sort methods for building query with support for sorting using
+// sortProvider provides a reusable set of sort methods for building query with support for sorting using
 // the "sort" query parameter.
 //
 // It is designed to be embedded in builder types to provide consistent sorting capabilities.
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
-type sortable[T any] struct {
+type sortProvider[T any] struct {
 	builder  T
 	rawSorts []string
 }
 
-// newSortable creates a new sortable instance with the given builder and apply function.
+// newSortProvider creates a new sortProvider instance with the given builder and apply function.
 // The apply function is used to add a sort to the builder and return the builder for chaining.
-func newSortable[T any](builder T) sortable[T] {
-	return sortable[T]{
+func newSortProvider[T any](builder T) sortProvider[T] {
+	return sortProvider[T]{
 		builder:  builder,
 		rawSorts: []string{},
 	}
 }
 
 // apply takes the url.Values and adds the "sort" query parameter to it with all the sorts
-// that have been added to the sortable instance.
+// that have been added to the sortProvider instance.
 //
 // It returns a new copy of the provided url.Values with the "sort" query parameter added.
-func (s *sortable[T]) apply(query url.Values) url.Values {
+func (s *sortProvider[T]) apply(query url.Values) url.Values {
 	if query == nil || len(s.rawSorts) < 1 {
 		return query
 	}
@@ -51,7 +51,7 @@ func (s *sortable[T]) apply(query url.Values) url.Values {
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
-func (s *sortable[T]) SortAscBy(column string) T {
+func (s *sortProvider[T]) SortAscBy(column string) T {
 	s.rawSorts = append(s.rawSorts, column)
 	return s.builder
 }
@@ -68,7 +68,7 @@ func (s *sortable[T]) SortAscBy(column string) T {
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
-func (s *sortable[T]) SortDescBy(column string) T {
+func (s *sortProvider[T]) SortDescBy(column string) T {
 	s.rawSorts = append(s.rawSorts, "-"+column)
 	return s.builder
 }

@@ -13,8 +13,8 @@ type readBuilder struct {
 	recordID int
 	fields   []string
 
-	contextable[*readBuilder]
-	fieldable[*readBuilder]
+	contextProvider[*readBuilder]
+	fieldProvider[*readBuilder]
 }
 
 // ReadRecord initiates the construction of a read query for a single record.
@@ -26,8 +26,8 @@ func (t *Table) ReadRecord(recordID int) *readBuilder {
 		recordID: recordID,
 	}
 
-	b.contextable = newContextable(b)
-	b.fieldable = newFieldable(b)
+	b.contextProvider = newContextProvider(b)
+	b.fieldProvider = newFieldProvider(b)
 
 	return b
 }
@@ -53,10 +53,10 @@ func (b *readBuilder) Execute() (ReadResponse, error) {
 	}
 
 	query := url.Values{}
-	query = b.fieldable.apply(query)
+	query = b.fieldProvider.apply(query)
 
 	path := fmt.Sprintf("/api/v2/tables/%s/records/%d", b.table.tableID, b.recordID)
-	respBody, err := b.table.client.request(b.contextable.ctx, http.MethodGet, path, nil, query)
+	respBody, err := b.table.client.request(b.contextProvider.ctx, http.MethodGet, path, nil, query)
 	if err != nil {
 		return ReadResponse{}, fmt.Errorf("failed to read record: %w", err)
 	}

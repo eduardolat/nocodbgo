@@ -7,23 +7,23 @@ import (
 	"net/url"
 )
 
-// listBuilder is used to build a list query with a fluent API
-type listBuilder struct {
+// listRecordsBuilder is used to build a list query with a fluent API
+type listRecordsBuilder struct {
 	table *Table
 
-	contextProvider[*listBuilder]
-	filterProvider[*listBuilder]
-	sortProvider[*listBuilder]
-	paginationProvider[*listBuilder]
-	fieldProvider[*listBuilder]
-	shuffleProvider[*listBuilder]
-	viewIDProvider[*listBuilder]
+	contextProvider[*listRecordsBuilder]
+	filterProvider[*listRecordsBuilder]
+	sortProvider[*listRecordsBuilder]
+	paginationProvider[*listRecordsBuilder]
+	fieldProvider[*listRecordsBuilder]
+	shuffleProvider[*listRecordsBuilder]
+	viewIDProvider[*listRecordsBuilder]
 }
 
 // ListRecords initiates the construction of a query to list records from a table.
 // Returns a listBuilder for further configuration and execution.
-func (t *Table) ListRecords() *listBuilder {
-	b := &listBuilder{
+func (t *Table) ListRecords() *listRecordsBuilder {
+	b := &listRecordsBuilder{
 		table: t,
 	}
 
@@ -109,7 +109,7 @@ func (r ListResponse) DecodeInto(dest any) error {
 
 // Execute performs the list operation with the configured parameters.
 // Returns a ListResponse containing the records and pagination information, or an error if the operation fails.
-func (b *listBuilder) Execute() (ListResponse, error) {
+func (b *listRecordsBuilder) Execute() (ListResponse, error) {
 	query := url.Values{}
 	query = b.filterProvider.apply(query)
 	query = b.sortProvider.apply(query)

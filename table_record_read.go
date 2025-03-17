@@ -7,21 +7,21 @@ import (
 	"net/url"
 )
 
-// readBuilder is used to build a read query with a fluent API
-type readBuilder struct {
+// readRecordBuilder is used to build a read query with a fluent API
+type readRecordBuilder struct {
 	table    *Table
 	recordID int
 	fields   []string
 
-	contextProvider[*readBuilder]
-	fieldProvider[*readBuilder]
+	contextProvider[*readRecordBuilder]
+	fieldProvider[*readRecordBuilder]
 }
 
 // ReadRecord initiates the construction of a read query for a single record.
 // It accepts a record ID to identify which record to retrieve.
 // Returns a readBuilder for further configuration and execution.
-func (t *Table) ReadRecord(recordID int) *readBuilder {
-	b := &readBuilder{
+func (t *Table) ReadRecord(recordID int) *readRecordBuilder {
+	b := &readRecordBuilder{
 		table:    t,
 		recordID: recordID,
 	}
@@ -47,7 +47,7 @@ func (r ReadResponse) DecodeInto(dest any) error {
 
 // Execute performs the read operation with the configured parameters.
 // Returns a ReadResponse containing the record data or an error if the operation fails.
-func (b *readBuilder) Execute() (ReadResponse, error) {
+func (b *readRecordBuilder) Execute() (ReadResponse, error) {
 	if b.recordID == 0 {
 		return ReadResponse{}, ErrRowIDRequired
 	}

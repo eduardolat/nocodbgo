@@ -43,103 +43,103 @@ func (f *filters[T]) Where(filter string) T {
 	return f.builder
 }
 
-// WhereEqualsTo adds a filter to the "where" query parameter of the request that matches
+// WhereIsEqualTo adds a filter to the "where" query parameter of the request that matches
 // records where the specified column equals the given value.
 //
 // Example:
 //
 //	// Where MyField equals foo
-//	query = query.WhereEqualsTo("MyField", "foo")
+//	query = query.WhereIsEqualTo("MyField", "foo")
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereEqualsTo(column string, value string) T {
+func (f *filters[T]) WhereIsEqualTo(column string, value string) T {
 	filter := fmt.Sprintf("(%s,eq,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
 }
 
-// WhereNotEqualsTo adds a filter to the "where" query parameter of the request that matches
+// WhereIsNotEqualTo adds a filter to the "where" query parameter of the request that matches
 // records where the specified column does not equal the given value.
 //
 // Example:
 //
 //	// Where MyField does not equal foo
-//	query = query.WhereNotEqualsTo("MyField", "foo")
+//	query = query.WhereIsNotEqualTo("MyField", "foo")
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereNotEqualsTo(column string, value string) T {
+func (f *filters[T]) WhereIsNotEqualTo(column string, value string) T {
 	filter := fmt.Sprintf("(%s,neq,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
 }
 
-// WhereGreaterThan adds a filter to the "where" query parameter of the request that matches
+// WhereIsGreaterThan adds a filter to the "where" query parameter of the request that matches
 // records where the specified column is greater than the given value.
 //
 // Example:
 //
 //	// Where MyField is greater than 55
-//	query = query.WhereGreaterThan("MyField", "55")
+//	query = query.WhereIsGreaterThan("MyField", "55")
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereGreaterThan(column string, value string) T {
+func (f *filters[T]) WhereIsGreaterThan(column string, value string) T {
 	filter := fmt.Sprintf("(%s,gt,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
 }
 
-// WhereGreaterThanOrEqual adds a filter to the "where" query parameter of the request that matches
+// WhereIsGreaterThanOrEqual adds a filter to the "where" query parameter of the request that matches
 // records where the specified column is greater than or equal to the given value.
 //
 // Example:
 //
 //	// Where MyField is greater than or equal to 55
-//	query = query.WhereGreaterThanOrEqual("MyField", "55")
+//	query = query.WhereIsGreaterThanOrEqual("MyField", "55")
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereGreaterThanOrEqual(column string, value string) T {
+func (f *filters[T]) WhereIsGreaterThanOrEqual(column string, value string) T {
 	filter := fmt.Sprintf("(%s,ge,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
 }
 
-// WhereLessThan adds a filter to the "where" query parameter of the request that matches
+// WhereIsLessThan adds a filter to the "where" query parameter of the request that matches
 // records where the specified column is less than the given value.
 //
 // Example:
 //
 //	// Where MyField is less than 55
-//	query = query.WhereLessThan("MyField", "55")
+//	query = query.WhereIsLessThan("MyField", "55")
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereLessThan(column string, value string) T {
+func (f *filters[T]) WhereIsLessThan(column string, value string) T {
 	filter := fmt.Sprintf("(%s,lt,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
 }
 
-// WhereLessThanOrEqual adds a filter to the "where" query parameter of the request that matches
+// WhereIsLessThanOrEqual adds a filter to the "where" query parameter of the request that matches
 // records where the specified column is less than or equal to the given value.
 //
 // Example:
 //
 //	// Where MyField is less than or equal to 55
-//	query = query.WhereLessThanOrEqual("MyField", "55")
+//	query = query.WhereIsLessThanOrEqual("MyField", "55")
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereLessThanOrEqual(column string, value string) T {
+func (f *filters[T]) WhereIsLessThanOrEqual(column string, value string) T {
 	filter := fmt.Sprintf("(%s,le,%s)", column, value)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder

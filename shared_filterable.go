@@ -2,10 +2,13 @@ package nocodbgo
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 )
 
-// Filters provides a reusable set of filter methods for building query filterable.
+// filterable provides a reusable set of filter methods for building query with support for filters using
+// the "where" query parameter.
+//
 // It is designed to be embedded in builder types to provide consistent filtering capabilities.
 //
 // Documentation:
@@ -16,12 +19,20 @@ type filterable[T any] struct {
 	rawFilters []string
 }
 
-// newFilters creates a new Filters instance with the given builder and apply function.
+// newFilterable creates a new filterable instance with the given builder and apply function.
 // The apply function is used to add a filter to the builder and return the builder for chaining.
-func newFilters[T any](builder T) filterable[T] {
+func newFilterable[T any](builder T) filterable[T] {
 	return filterable[T]{
 		builder:    builder,
 		rawFilters: []string{},
+	}
+}
+
+// apply takes the url.Values and adds the "where" query parameter to it with all the filters
+// that have been added to the filterable instance.
+func (f *filterable[T]) apply(query url.Values) {
+	if len(f.rawFilters) > 0 {
+		query.Set("where", strings.Join(f.rawFilters, "~and"))
 	}
 }
 

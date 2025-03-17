@@ -165,12 +165,10 @@ func (c *Client) request(ctx context.Context, method string, path string, body a
 		reqBody = bytes.NewBuffer(jsonBody)
 	}
 
-	var req *http.Request
-	if ctx != nil {
-		req, err = http.NewRequestWithContext(ctx, method, parsedUrl.String(), reqBody)
-	} else {
-		req, err = http.NewRequest(method, parsedUrl.String(), reqBody)
+	if ctx == nil {
+		ctx = context.Background()
 	}
+	req, err := http.NewRequestWithContext(ctx, method, parsedUrl.String(), reqBody)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)

@@ -73,7 +73,7 @@ func (p *paginationProvider[T]) Offset(offset int) T {
 
 // Page sets the page number and page size for the query to return a specific amount of records.
 //
-// It converts the page number and page size to a limit and offset and sets them on the pageable instance.
+// It converts the page number and page size to a "limit" and "offset" and sets them on the query parameters.
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params

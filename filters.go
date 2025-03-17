@@ -251,18 +251,18 @@ func (f *filters[T]) WhereIsBetween(column string, min, max string) T {
 	return f.builder
 }
 
-// WhereNotIsBetween adds a filter to the "where" query parameter of the request that matches
+// WhereIsNotBetween adds a filter to the "where" query parameter of the request that matches
 // records where the specified column's value is not between the min and max values.
 //
 // Example:
 //
 //	// Where MyField is not between 55 and 66
-//	query = query.WhereNotIsBetween("MyField", "55", "66")
+//	query = query.WhereIsNotBetween("MyField", "55", "66")
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereNotIsBetween(column string, min, max string) T {
+func (f *filters[T]) WhereIsNotBetween(column string, min, max string) T {
 	filter := fmt.Sprintf("(%s,nbtw,%s,%s)", column, min, max)
 	f.rawFilters = append(f.rawFilters, filter)
 	return f.builder
@@ -330,19 +330,19 @@ func (f *filters[T]) WhereIsWithin(column string, subOperation string) T {
 	return f.builder
 }
 
-// WhereAllOf adds a filter to the "where" query parameter of the request that matches
+// WhereIsAllOf adds a filter to the "where" query parameter of the request that matches
 // records where the specified column contains all of the provided values.
 // Typically used with multi-select or array columns.
 //
 // Example:
 //
 //	// Where MyField contains all of the values
-//	query = query.WhereAllOf("MyField", "55", "66", "77")
+//	query = query.WhereIsAllOf("MyField", "55", "66", "77")
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereAllOf(column string, values ...string) T {
+func (f *filters[T]) WhereIsAllOf(column string, values ...string) T {
 	if len(values) == 0 {
 		return f.builder
 	}
@@ -352,19 +352,19 @@ func (f *filters[T]) WhereAllOf(column string, values ...string) T {
 	return f.builder
 }
 
-// WhereAnyOf adds a filter to the "where" query parameter of the request that matches
+// WhereIsAnyOf adds a filter to the "where" query parameter of the request that matches
 // records where the specified column contains any of the provided values.
 // Typically used with multi-select or array columns.
 //
 // Example:
 //
 //	// Where MyField contains any of the values
-//	query = query.WhereAnyOf("MyField", "55", "66", "77")
+//	query = query.WhereIsAnyOf("MyField", "55", "66", "77")
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereAnyOf(column string, values ...string) T {
+func (f *filters[T]) WhereIsAnyOf(column string, values ...string) T {
 	if len(values) == 0 {
 		return f.builder
 	}
@@ -374,19 +374,19 @@ func (f *filters[T]) WhereAnyOf(column string, values ...string) T {
 	return f.builder
 }
 
-// WhereNotAllOf adds a filter to the "where" query parameter of the request that matches
+// WhereIsNotAllOf adds a filter to the "where" query parameter of the request that matches
 // records where the specified column does not contain all of the provided values.
 // Typically used with multi-select or array columns.
 //
 // Example:
 //
 //	// Where MyField does not contain all of the values
-//	query = query.WhereNotAllOf("MyField", "55", "66", "77")
+//	query = query.WhereIsNotAllOf("MyField", "55", "66", "77")
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereNotAllOf(column string, values ...string) T {
+func (f *filters[T]) WhereIsNotAllOf(column string, values ...string) T {
 	if len(values) == 0 {
 		return f.builder
 	}
@@ -396,19 +396,19 @@ func (f *filters[T]) WhereNotAllOf(column string, values ...string) T {
 	return f.builder
 }
 
-// WhereNotAnyOf adds a filter to the "where" query parameter of the request that matches
+// WhereIsNotAnyOf adds a filter to the "where" query parameter of the request that matches
 // records where the specified column does not contain any of the provided values.
 // Typically used with multi-select or array columns.
 //
 // Example:
 //
 //	// Where MyField does not contain any of the values
-//	query = query.WhereNotAnyOf("MyField", "55", "66", "77")
+//	query = query.WhereIsNotAnyOf("MyField", "55", "66", "77")
 //
 // Documentation:
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#query-params
 //   - https://docs.nocodb.com/developer-resources/rest-apis/overview/#comparison-operators
-func (f *filters[T]) WhereNotAnyOf(column string, values ...string) T {
+func (f *filters[T]) WhereIsNotAnyOf(column string, values ...string) T {
 	if len(values) == 0 {
 		return f.builder
 	}

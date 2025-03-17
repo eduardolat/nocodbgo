@@ -8,17 +8,21 @@ import (
 // updateRecordBuilder is used to build an update query with a fluent API
 type updateRecordBuilder struct {
 	table    *Table
-	recordID int
 	data     map[string]any
 	chainErr error // Stores any error in the chain of methods
 
 	contextProvider[*updateRecordBuilder]
 }
 
-// UpdateRecord initiates the construction of an update query for a single record.
+// UpdateRecord updates a single record in the table.
 //
-// It accepts a record ID and the data to update, which can be either a map[string]any or a struct with JSON tags.
-func (t *Table) UpdateRecord(recordID int, data any) *updateRecordBuilder {
+// Parameters:
+//   - data: The data to update the record with, can be a map[string]any or a struct with JSON tags that match the table columns.
+//
+// Notes:
+//   - The "data" parameter must contain an "Id" field to identify which record to update.
+//   - It will update the fields that are present in the "data" parameter even if they are zero values, so if you want to update a single field, you can use a map.
+func (t *Table) UpdateRecord(data any) *updateRecordBuilder {
 	var dataMap map[string]any
 	var err error
 
@@ -31,7 +35,6 @@ func (t *Table) UpdateRecord(recordID int, data any) *updateRecordBuilder {
 
 	b := &updateRecordBuilder{
 		table:    t,
-		recordID: recordID,
 		data:     dataMap,
 		chainErr: err,
 	}
@@ -43,23 +46,12 @@ func (t *Table) UpdateRecord(recordID int, data any) *updateRecordBuilder {
 
 // Execute finalizes and executes the operation.
 func (b *updateRecordBuilder) Execute() error {
-	if b.recordID == 0 {
-		return ErrRowIDRequired
-	}
-
 	if b.chainErr != nil {
 		return fmt.Errorf("error in the chain of methods: %w", b.chainErr)
 	}
 
-	// Add ID to the data
-	updateData := make(map[string]any)
-	for k, v := range b.data {
-		updateData[k] = v
-	}
-	updateData["Id"] = b.recordID
-
 	err := b.table.
-		UpdateRecords([]map[string]any{updateData}).
+		UpdateRecords([]map[string]any{b.data}).
 		WithContext(b.contextProvider.ctx).
 		Execute()
 	if err != nil {
@@ -78,11 +70,14 @@ type updateRecordsBuilder struct {
 	contextProvider[*updateRecordsBuilder]
 }
 
-// UpdateRecords initiates the construction of a bulk update query for multiple records.
+// UpdateRecords updates multiple records in the table.
 //
-// It accepts data which can be either a []map[string]any or a slice of structs with JSON tags.
+// Parameters:
+//   - data: The data to update the records with, can be a []map[string]any or a slice of structs with JSON tags that match the table columns.
 //
-// Each record must have an "Id" field to identify which record to update.
+// Notes:
+//   - Each record in the "data" parameter must have an "Id" field to identify which record to update.
+//   - It will update the fields that are present in the "data" parameter even if they are zero values, so if you want to update a single field, you can use a map.
 func (t *Table) UpdateRecords(data any) *updateRecordsBuilder {
 	var dataMaps []map[string]any
 	var err error

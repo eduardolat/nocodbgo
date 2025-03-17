@@ -16,9 +16,10 @@ type readRecordBuilder struct {
 	fieldProvider[*readRecordBuilder]
 }
 
-// ReadRecord initiates the construction of a read query for a single record.
-// It accepts a record ID to identify which record to retrieve.
-// Returns a readBuilder for further configuration and execution.
+// ReadRecord reads a single record from the table.
+//
+// Parameters:
+//   - recordID: The identifier of the record to read.
 func (t *Table) ReadRecord(recordID int) *readRecordBuilder {
 	b := &readRecordBuilder{
 		table:    t,

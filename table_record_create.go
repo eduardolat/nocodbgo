@@ -15,9 +15,10 @@ type createRecordBuilder struct {
 	contextProvider[*createRecordBuilder]
 }
 
-// CreateRecord initiates the construction of a create operation for a single record.
+// CreateRecord creates a single record in the table.
 //
-// It accepts data which can be either a map[string]any or a struct with JSON tags.
+// Parameters:
+//   - data: The data to create the record with, can be a map[string]any or a struct with JSON tags that match the table columns.
 func (t *Table) CreateRecord(data any) *createRecordBuilder {
 	var dataMap map[string]any
 	var err error
@@ -70,9 +71,10 @@ type createRecordsBuilder struct {
 	contextProvider[*createRecordsBuilder]
 }
 
-// CreateRecords initiates the construction of a bulk create operation for multiple records.
+// CreateRecords creates multiple records in the table.
 //
-// It accepts data which can be either a []map[string]any or a slice of structs with JSON tags.
+// Parameters:
+//   - data: The data to create the records with, can be a []map[string]any or a slice of structs with JSON tags that match the table columns.
 func (t *Table) CreateRecords(data any) *createRecordsBuilder {
 	var dataMaps []map[string]any
 	var err error

@@ -16,8 +16,7 @@ type countRecordsBuilder struct {
 	viewIDProvider[*countRecordsBuilder]
 }
 
-// CountRecords initiates the construction of a query to count records in a table.
-// Returns a countBuilder for further configuration and execution.
+// CountRecords counts the number of records in the table.
 func (t *Table) CountRecords() *countRecordsBuilder {
 	b := &countRecordsBuilder{
 		table: t,

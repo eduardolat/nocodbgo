@@ -13,9 +13,10 @@ type deleteRecordBuilder struct {
 	contextProvider[*deleteRecordBuilder]
 }
 
-// DeleteRecord initiates the construction of a delete operation for a single record.
+// DeleteRecord deletes a single record in the table.
 //
-// It accepts a record ID to identify which record to delete.
+// Parameters:
+//   - recordID: The identifier of the record to delete.
 func (t *Table) DeleteRecord(recordID int) *deleteRecordBuilder {
 	b := &deleteRecordBuilder{
 		table:    t,
@@ -52,9 +53,10 @@ type deleteRecordsBuilder struct {
 	contextProvider[*deleteRecordsBuilder]
 }
 
-// DeleteRecords initiates the construction of a bulk delete operation for multiple records.
+// DeleteRecords deletes multiple records in the table.
 //
-// It accepts a slice of record IDs to identify which records to delete.
+// Parameters:
+//   - recordIDs: A slice of record IDs to identify which records to delete.
 func (t *Table) DeleteRecords(recordIDs []int) *deleteRecordsBuilder {
 	b := &deleteRecordsBuilder{
 		table:     t,

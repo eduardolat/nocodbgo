@@ -20,8 +20,7 @@ type listRecordsBuilder struct {
 	viewIDProvider[*listRecordsBuilder]
 }
 
-// ListRecords initiates the construction of a query to list records from a table.
-// Returns a listBuilder for further configuration and execution.
+// ListRecords lists records from the table.
 func (t *Table) ListRecords() *listRecordsBuilder {
 	b := &listRecordsBuilder{
 		table: t,

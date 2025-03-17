@@ -28,7 +28,7 @@ func newShuffleProvider[T any](builder T) shuffleProvider[T] {
 //
 // It returns a new copy of the provided url.Values with the "shuffle" query parameter added.
 func (s *shuffleProvider[T]) apply(query url.Values) url.Values {
-	if query == nil || s.rawShuffle == false {
+	if query == nil || !s.rawShuffle {
 		return query
 	}
 

@@ -11,7 +11,6 @@ import (
 type readRecordBuilder struct {
 	table    *Table
 	recordID int
-	fields   []string
 
 	contextProvider[*readRecordBuilder]
 	fieldProvider[*readRecordBuilder]
